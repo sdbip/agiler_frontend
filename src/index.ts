@@ -1,18 +1,24 @@
-#!/usr/bin/env node
-import express, { json, urlencoded, Router } from 'express';
-import { createServer } from 'http';
+import { render, resolve } from './page-renderer.js'
+import { setupServer } from './server.js'
 
-const app = express();
+const setup = setupServer()
 
-app.use(json());
-app.use(urlencoded({ extended: false }));
+setup.public(resolve('../public'))
+setup.get('/', () => render('index'))
+setup.get('/index', () => render('index'))
+setup.get('/features', () => render('features'))
 
-var router = Router();
-router.get('/', (req: unknown, res: any) => {
-  res.json({message: 'alive', test: process.env.TEST});
-});
-app.use('/', router);
+const server = setup.finalize()
+const port = parseInt(process.env.PORT ?? '80') ?? 80
+server.listenAtPort(port)
 
-const port = process.env.PORT ?? 80
-const server = createServer(app);
-server.listen(port);
+process.stdout.write(`\x1B[35mListening on port \x1B[30m${port}\x1B[0m\n\n`)
+
+export function start() {
+  server.stopListening()
+  server.listenAtPort(port)
+}
+
+export function stop() {
+  server.stopListening()
+}

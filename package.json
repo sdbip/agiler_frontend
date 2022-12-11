@@ -7,7 +7,7 @@
     "lint": "eslint",
     "build": "npx tsc",
     "start": "node ./dist/index.js",
-    "test": "mocha"
+    "test": "source .env.test && mocha"
   },
   "devDependencies": {
     "@types/chai": "^4.3.4",
