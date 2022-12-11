@@ -1,0 +1,14 @@
+# Stories
+- Task
+  - add
+  - complete
+  - promote to Story
+- Story
+  - add subtask
+- Feature
+  - add
+  - add child (become Epic)
+
+## Tasks
+- webpack?
+- web test runner
