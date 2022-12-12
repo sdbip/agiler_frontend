@@ -1,4 +1,6 @@
+.DS_Store
 .env
 .env.test
-node_modules
-*.bundle.js.LICENSE.txt
+/node_modules
+/dist/src
+/dist/public/*.bundle.js*
