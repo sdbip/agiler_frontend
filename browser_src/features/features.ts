@@ -1,17 +1,19 @@
 import globals from '../globals.js'
-import { ItemComponent } from '../item-component.js'
+import { render } from '../templates.js'
+import { UIEventArgs } from '../index/ui-event-args.js'
+import { DOMElement } from '../dom-element.js'
+import { Popup } from './popup.js'
 import { PageComponent } from '../page-component.js'
 import { ClassName } from '../class-name.js'
-import { UIEventArgs } from './ui-event-args.js'
-import { render } from '../templates.js'
 import { ItemCache, ItemCacheEvent } from '../item-cache.js'
 import { Backend } from '../backend/backend.js'
 import { ItemType } from '../backend/dtos.js'
+import { ItemComponent } from '../item-component.js'
 
 (async () => {
-  const pageContainer = document.getElementById('page-container')
+  const pageContainer = DOMElement.single({ id: 'page-container' })
   if (!pageContainer) throw Error('page container not found')
-  pageContainer.innerHTML = await render('page-component', {})
+  pageContainer.setInnerHTML(await render('page-component', {}))
   updateItems()
 })()
 
@@ -35,23 +37,27 @@ cache.on(ItemCacheEvent.ItemsRemoved, items => {
 
 globals.emitUIEvent = async (name: string, args: UIEventArgs) => {
   switch (name) {
+    case 'help-mouseover': {
+      const popup = await Popup.forSnippet(args.element.dataset.snippet)
+      popup.showNear(new DOMElement(args.element))
+      break
+    }
+    case 'help-mouseout': {
+      const popup = await Popup.forSnippet(args.element.dataset.snippet)
+      popup?.hide()
+      break
+    }
     case 'focus':
     case 'input':
     case 'blur':
       notifyUI(name, args.itemId, args)
       break
-    case 'complete-clicked':
-      await completeTask({ id: args.itemId })
-      break
-    case 'promote-clicked':
-      await promote({ id: args.itemId })
-      break
     case 'title-keydown':
       if (isEnterPressed(args.event as KeyboardEvent))
-        await addTask({ id: args.itemId })
+        await addFeature({ id: args.itemId })
       break
     case 'add-button-clicked':
-      await addTask({ id: args.itemId })
+      await addFeature({ id: args.itemId })
       break
     case 'disclosure-button-clicked':
       await toggleDisclosed({ id: args.itemId })
@@ -64,48 +70,49 @@ globals.emitUIEvent = async (name: string, args: UIEventArgs) => {
   }
 }
 
+const helpElements = DOMElement.all({ className: { name: 'hover-help' } })
+for (const helpElement of helpElements) {
+  helpElement.on('mouseover', async event => {
+    globals.emitUIEvent('help-mouseover', { event, element: event.eventData.target })
+  })
+
+  helpElement.on('mouseout', async event => {
+    globals.emitUIEvent('help-mouseout', { event, element: event.eventData.target })
+  })
+}
+
 function notifyUI(event: string, itemId?: string, args?: any) {
   const component = (itemId ? ItemComponent.forId(itemId) : undefined) ?? PageComponent.instance
   component.handleUIEvent(event, args)
 }
 
-const completeTask = async ({ id }: { id: string }) => {
-
-  await cache.completeTask(id)
-}
-
-const addTask = async ({ id }: { id: string }) => {
+const addFeature = async ({ id }: { id: string }) => {
   const component = ItemComponent.forId(id) ?? PageComponent.instance
   const titleElement = component.titleInputElement
   if (!component.title) return
 
-  console.log('add task', await cache.addItem(ItemType.Task, component.title, id))
+  console.log('add Feature', await cache.addItem(ItemType.Feature, component.title, id))
   titleElement?.setInputElementValue('')
 
   await updateItems(component.itemId)
 }
 
-const promote = async ({ id }: { id: string }) => {
-  await cache.promoteTask(id)
-  await updateItems()
-}
-
 const toggleDisclosed = async ({ id }: { id: string }) => {
-  const storyComponent = ItemComponent.forId(id)
-  if (!storyComponent) throw new Error(`Component for story with id ${id} not found`)
+  const epicComponent = ItemComponent.forId(id)
+  if (!epicComponent) throw new Error(`Component for story with id ${id} not found`)
 
-  const wasDisclosed = storyComponent.element.hasClass(ClassName.disclosed)
+  const wasDisclosed = epicComponent.element.hasClass(ClassName.disclosed)
   if (!wasDisclosed) await updateItems(id)
   notifyUI(wasDisclosed ? 'collapse' : 'disclose', id)
 }
 
 // END EVENT HANDLERS
 
-async function updateItems(storyId?: string) {
-  notifyUI('loading', storyId)
+async function updateItems(epicId?: string) {
+  notifyUI('loading', epicId)
   try {
-    await cache.fetchItems(storyId, [ ItemType.Story, ItemType.Task ])
+    await cache.fetchItems(epicId, [ ItemType.Epic, ItemType.Feature ])
   } finally {
-    notifyUI('loading-done', storyId)
+    notifyUI('loading-done', epicId)
   }
 }

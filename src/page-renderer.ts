@@ -4,13 +4,14 @@ import { promises as fs } from 'fs'
 import { HTMLDocument } from 'happy-dom'
 import { marked } from 'marked'
 import { fileURLToPath } from 'url'
+import * as env from './config.js'
 
 export class PageRenderer {
   private constructor(readonly document: HTMLDocument) { }
 
   static async mustache(page: string) {
     const data = await fs.readFile(resolve('../pages/template.mustache.html'))
-    const html = Mustache.render(data.toString('utf-8'), { page })
+    const html = Mustache.render(data.toString('utf-8'), { page, ...env })
     return this.read(html)
   }
 

@@ -1,7 +1,6 @@
 {
     "extends": "./tsconfig.json",
     "exclude": [
-      "browser_source/**/*",
       "browser_test/**/*",
       "test/**/*"
     ]

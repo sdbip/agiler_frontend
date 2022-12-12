@@ -1,0 +1,9 @@
+<div class="flex">
+  <input type="text" id="item-title"
+    onfocus="emitUIEvent('focus', {element: this, event})"
+    oninput="emitUIEvent('input', {element: this, event})"
+    onblur="emitUIEvent('blur', {element: this, event})"
+    onkeydown="emitUIEvent('title-keydown', {element: this, event})" placeholder="What does the business need?">
+  <div id="add-button" class="add-button" onclick="emitUIEvent('add-button-clicked', {element: this, event})">+</div>
+</div>
+<div id="item-list" class="item-list"></div>

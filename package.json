@@ -5,10 +5,10 @@
   "private": true,
   "scripts": {
     "lint": "eslint",
-    "dev": "source .env && yarn deploy && webpack && yarn start",
+    "dev": "source .env && yarn deploy && yarn start",
     "start": "node ./dist/src/index.js",
     "test": "source .env.test && mocha && wtr --node-resolve --esbuild-target auto",
-    "deploy": "rm -rf dist && npx tsc --project tsconfig.build.json"
+    "deploy": "rm -rf dist && npx tsc --project tsconfig.build.json && webpack && rm -rf dist/browser_src"
   },
   "devDependencies": {
     "@esm-bundle/chai": "^4.3.4-fix.0",

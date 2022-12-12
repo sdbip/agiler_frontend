@@ -1,0 +1,46 @@
+.item[data-type=Feature] {
+  margin-top: 3px;
+  background-color: beige;
+  color: rgb(60 45 40);
+}
+
+.item[data-type=Epic] {
+  margin-top: 3px;
+  background-color: burlywood;
+  color: saddlebrown;
+}
+
+.item[data-type=Epic] > .title,
+.item[data-type=Feature] > .title {
+  font-weight: bold;
+  font-size: 11pt;
+}
+
+.item[data-type=Epic] > .title > sup {
+  padding: 0 2px;
+  color: lavender;
+  background-color: darkblue;
+  font-family: cursive;
+  font-weight: bold;
+  font-size: 6pt;
+  top: -7px;
+}
+
+.item[data-type=Epic] input::placeholder {
+  color: beige;
+}
+
+.item[data-type=Feature] > .description {
+  font-style: italic;
+  font-size: 9pt;
+}
+
+a {
+  color: aqua;
+  text-decoration: dotted underline;
+}
+
+.add-button {
+  background-color: peru;
+  color: rgb(240, 240, 255);
+}

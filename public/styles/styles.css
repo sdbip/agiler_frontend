@@ -1,0 +1,141 @@
+body {
+  font-family: system-ui;
+  font-size: 10pt;
+  color: rgb(240, 240, 255);
+  background-color: rgb(30, 50, 60);
+  width: 750px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.no-select {
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+.item {
+  position: relative;
+  margin: 1px;
+  padding: 10px;
+  padding-left: 40px;
+  box-shadow: 0px 2px 5px 1px rgb(0 0 0 / 15%);
+  border-radius: 20px;
+  transition: border-radius 1s ease-out;
+}
+
+.item.disclosed {
+  border-radius: 10px;
+}
+
+.disclosure-button {
+  position: absolute;
+  top: 6px;
+  right: 2px;
+  width: 20px;
+  height: 20px;
+  z-index: 20;
+  border-radius: 3px;
+}
+
+.disclosure-button:hover {
+  border: 1px solid grey;
+}
+
+.chevron {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  transition: transform .2s;
+}
+
+.disclosed > .chevron {
+  transform: rotate(45deg) translate(.75px, -0.25px);
+}
+
+.collapsible {
+  margin-top: 5px;
+  overflow-y: hidden;
+  transition: height .6s ease;
+  position: relative;
+}
+
+.spinner {
+  position: absolute;
+  height: 20px;
+  right: 3px;
+  top: 6px;
+}
+
+.spinner.inactive {
+  display: none;
+}
+
+.flex {
+  display: flex;
+}
+
+.flex > input[type="text"] {
+  flex: 1;
+  margin-right: 6px;
+  padding: 5px;
+  border: 1px solid silver;
+  border-radius: 5px;
+
+  font-size: 10pt;
+
+  color: rgb(255 228 196);
+  background-color: rgba(0, 0, 0, 0.3);
+  outline-color: white;
+}
+
+.add-button {
+  height: 22px;
+  width: 22px;
+  padding: 0;
+  border: 1px solid silver;
+  border-radius: 22px;
+  font-size: 10pt;
+  background-color: white;
+  text-align: center;
+  line-height: 20px;
+  user-select: none;
+  -webkit-user-select: none;
+  margin-top: 1px;
+  cursor: default;
+}
+
+.add-button.default {
+  background-color: dodgerblue;
+}
+
+.add-button:hover {
+  transform: translateY(-1px);
+}
+
+.add-button:active {
+  background-color: dodgerblue;
+  transform: translateY(1px);
+}
+
+.measure {
+  position: relative;
+  height: 0;
+  width: 0;
+}
+
+.measure > * {
+  position: fixed;
+  bottom: 10px;
+  left: 10px;
+}
+
+.pop-up {
+  border-radius: 10px;
+  padding: 10px;
+  color: darkslategrey;
+  background-color: blanchedalmond;
+  box-shadow: 0px 2px 5px 1px rgb(0 0 0 / 15%);
+  position: absolute;
+  width: 200px;
+  display: none;
+}
