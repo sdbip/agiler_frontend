@@ -1,9 +1,10 @@
 import { render, resolve } from './page-renderer.js'
 import { setupServer } from './server.js'
+import { DIST_DIR } from './config.js'
 
 const setup = setupServer()
 
-setup.public(resolve('../public'))
+setup.public(resolve(`../${DIST_DIR}/public`))
 setup.get('/', () => render('index'))
 setup.get('/index', () => render('index'))
 setup.get('/features', () => render('features'))

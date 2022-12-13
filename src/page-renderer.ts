@@ -10,8 +10,11 @@ export class PageRenderer {
   private constructor(readonly document: HTMLDocument) { }
 
   static async mustache(page: string) {
-    const data = await fs.readFile(resolve('../pages/template.mustache.html'))
-    const html = Mustache.render(data.toString('utf-8'), { page, ...env })
+    const data = await fs.readFile(resolve(`../${env.DIST_DIR}/pages/template.mustache.html`))
+    const template = data.toString('utf-8')
+      .replace('{{READ_MODEL_URL}}', env.READ_MODEL_URL)
+      .replace('{{WRITE_MODEL_URL}}', env.WRITE_MODEL_URL)
+    const html = Mustache.render(template, { page })
     return this.read(html)
   }
 
@@ -22,7 +25,7 @@ export class PageRenderer {
   }
 
   async inject(page: string) {
-    const data = await fs.readFile(resolve(`../pages/${page}.md`))
+    const data = await fs.readFile(resolve(`../${env.DIST_DIR}/pages/${page}.md`))
     const markdown = data.toString('utf-8')
     const html = marked.parse(markdown)
     this.document.body.innerHTML = html

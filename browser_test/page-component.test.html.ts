@@ -12,7 +12,7 @@ runTests(() => {
   let addButtonElement: DOMElement
 
   before(async () => {
-    setBaseURL('..')
+    setBaseURL('../dist')
     await renderPageComponent()
 
     titleInputElement = getElementById('item-title')

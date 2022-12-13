@@ -8,7 +8,7 @@ import { DOMElement } from '../browser_src/dom-element.js'
 
 runTests(() => {
   before(async () => {
-    setBaseURL('..')
+    setBaseURL('../dist')
     await renderPageComponent()
     await renderItems([
       {
