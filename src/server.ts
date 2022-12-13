@@ -72,6 +72,52 @@ export const setupServer = (): ServerSetup => {
     function outputResult(response: express.Response, result: NormalizedResponse) {
       const responseData = result as Response
       response.statusCode = responseData?.statusCode ?? StatusCode.OK
+      response.setHeader('Content-Type', 'application/json')
+
+      response.end(result.content)
+    }
+  }
+
+  function htmlHandler(handler: Handler) {
+    return async (request: express.Request, response: express.Response) => {
+      const result = await callHandler(request)
+      outputResult(response, toResponse(result))
+    }
+
+    async function callHandler(request: Request) {
+      try {
+        return await handler(request)
+      } catch (thrown) {
+        const { message } = thrown as Error
+        const error = { message }
+        return {
+          statusCode: StatusCode.InternalServerError,
+          content: { error },
+        }
+      }
+    }
+
+    function toResponse(result: string | object): NormalizedResponse {
+      if (typeof result === 'string') return {
+        statusCode: StatusCode.OK,
+        content: result,
+      }
+
+      const responseData = result as Response
+      return {
+        statusCode: responseData.statusCode ?? StatusCode.OK,
+        content: typeof responseData.content === 'string'
+          ? responseData.content
+          : JSON.stringify('content' in responseData
+            ? responseData.content
+            : responseData),
+      }
+    }
+
+    function outputResult(response: express.Response, result: NormalizedResponse) {
+      const responseData = result as Response
+      response.statusCode = responseData?.statusCode ?? StatusCode.OK
+      response.setHeader('Content-Type', 'text/html')
 
       response.end(result.content)
     }
@@ -82,7 +128,7 @@ export const setupServer = (): ServerSetup => {
       app.use('/public', express.static(root, {}))
     },
     get: (path: string, handler: Handler) => {
-      app.get(path, wrapHandler(handler))
+      app.get(path, htmlHandler(handler))
     },
     post: (path: string, handler: Handler) => {
       app.post(path, wrapHandler(handler))
