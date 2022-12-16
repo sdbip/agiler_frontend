@@ -19,13 +19,14 @@ describe(ItemCache.name, () => {
         notifiedItems = items
       })
 
-      await cache.addItem(ItemType.Task, 'title')
+      await cache.addItem(ItemType.Feature, 'title', 'parent')
 
       assert.deepEqual(notifiedItems, [ {
         id: 'id',
+        parentId: 'parent',
         progress: Progress.NotStarted,
         title: 'title',
-        type: ItemType.Task,
+        type: ItemType.Feature,
       } ])
     })
 

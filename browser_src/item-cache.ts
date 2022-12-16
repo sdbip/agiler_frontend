@@ -41,7 +41,8 @@ export class ItemCache {
       id: response.id,
       progress: Progress.NotStarted,
       title,
-      type: ItemType.Task,
+      parentId,
+      type,
     }
     this.cacheItem(markUnverified(item))
     this.notify(ItemCacheEvent.ItemsAdded, [ item ])
