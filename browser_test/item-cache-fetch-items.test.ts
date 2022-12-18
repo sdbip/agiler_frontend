@@ -1,6 +1,6 @@
 import { assert } from '@esm-bundle/chai'
 import { ItemDTO, ItemType, Progress } from '../browser_src/backend/dtos.js'
-import { ItemCache, ItemCacheEvent } from '../browser_src/item-cache.js'
+import { CachedItem, ItemCache, ItemCacheEvent } from '../browser_src/item-cache.js'
 import { MockBackend } from './mocks'
 
 describe(`${ItemCache.name}.fetchItems`, () => {
@@ -47,7 +47,7 @@ describe(`${ItemCache.name}.fetchItems`, () => {
       backend.itemsToReturn = [ item1, item2 ]
 
       const cache = new ItemCache(backend)
-      cache.cacheItem(item1)
+      cache.cacheItem(CachedItem.item(item1))
 
       let notifiedItems: ItemDTO[] = []
       cache.on(ItemCacheEvent.ItemsAdded, items => {
@@ -68,7 +68,7 @@ describe(`${ItemCache.name}.fetchItems`, () => {
       backend.itemsToReturn = [ item ]
 
       const cache = new ItemCache(backend)
-      cache.cacheItem(item)
+      cache.cacheItem(CachedItem.item(item))
 
       let isNotified = false
       cache.on(ItemCacheEvent.ItemsAdded, () => { isNotified = true })
@@ -110,7 +110,7 @@ describe(`${ItemCache.name}.fetchItems`, () => {
       backend.itemsToReturn = [ item ]
 
       const cache = new ItemCache(backend)
-      cache.cacheItem({ ...item, title: 'Title before' })
+      cache.cacheItem(CachedItem.item({ ...item, title: 'Title before' }))
 
       let changedItems: ItemDTO[] | undefined
       cache.on(ItemCacheEvent.ItemsChanged, items => {
@@ -189,7 +189,7 @@ describe(`${ItemCache.name}.fetchItems`, () => {
       }
 
       const cache = new ItemCache(backend)
-      cache.cacheItem(item)
+      cache.cacheItem(CachedItem.item(item))
 
       let notifiedItems: ItemDTO[] = []
       cache.on(ItemCacheEvent.ItemsRemoved, items => {
@@ -210,7 +210,7 @@ describe(`${ItemCache.name}.fetchItems`, () => {
       backend.itemsToReturn = [ item1 ]
 
       const cache = new ItemCache(backend)
-      cache.cacheItem({ ...item1, title: 'Old title' })
+      cache.cacheItem(CachedItem.item({ ...item1, title: 'Old title' }))
 
       let isNotified = false
       cache.on(ItemCacheEvent.ItemsRemoved, () => { isNotified = true })

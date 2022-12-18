@@ -1,6 +1,6 @@
 import { assert } from '@esm-bundle/chai'
 import { ItemDTO, ItemType, Progress } from '../browser_src/backend/dtos.js'
-import { ItemCache, ItemCacheEvent } from '../browser_src/item-cache.js'
+import { CachedItem, ItemCache, ItemCacheEvent } from '../browser_src/item-cache.js'
 import { MockBackend } from './mocks'
 
 describe(`${ItemCache.name}.promoteTask`, () => {
@@ -17,12 +17,12 @@ describe(`${ItemCache.name}.promoteTask`, () => {
     let notifiedItems: ItemDTO[] = []
 
     const cache = new ItemCache(backend)
-    cache.cacheItem({
+    cache.cacheItem(CachedItem.item({
       id: 'task',
       progress: Progress.NotStarted,
       title: 'Promote Me',
       type: ItemType.Task,
-    })
+    }))
     cache.on(ItemCacheEvent.ItemsChanged, items => {
       notifiedItems = items
     })

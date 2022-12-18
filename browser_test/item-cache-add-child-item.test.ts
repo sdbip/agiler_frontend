@@ -1,6 +1,6 @@
 import { assert } from '@esm-bundle/chai'
 import { ItemDTO, ItemType, Progress } from '../browser_src/backend/dtos.js'
-import { ItemCache, ItemCacheEvent } from '../browser_src/item-cache.js'
+import { CachedItem, ItemCache, ItemCacheEvent } from '../browser_src/item-cache.js'
 import { MockBackend } from './mocks'
 
 describe(ItemCache.name, () => {
@@ -36,12 +36,12 @@ describe(ItemCache.name, () => {
       backend.idToReturn = 'id'
 
       const cache = new ItemCache(backend)
-      cache.cacheItem({
+      cache.cacheItem(CachedItem.item({
         id: 'epic',
         progress: Progress.NotStarted,
         title: 'Epic Feature',
         type: ItemType.Feature,
-      })
+      }))
       cache.on(ItemCacheEvent.ItemsChanged, (items) => {
         notifiedItems = items
       })
