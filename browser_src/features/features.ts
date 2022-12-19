@@ -17,7 +17,9 @@ import { ItemComponent } from '../item-component.js'
   updateItems()
 })()
 
-const cache = new ItemCache(new Backend())
+let temp_id = 1
+const nextId = () => `new_${++temp_id}`
+const cache = new ItemCache(new Backend(), nextId)
 
 // EVENT HANDLERS
 

@@ -14,15 +14,15 @@ describe(ItemCache.name, () => {
 
       backend.idToReturn = 'id'
 
-      const cache = new ItemCache(backend)
+      const cache = newCache('temp_id')
       cache.on(ItemCacheEvent.ItemsAdded, (items) => {
         notifiedItems = items
       })
 
-      await cache.addItem(ItemType.Feature, 'title', 'parent')
+      cache.addItem(ItemType.Feature, 'title', 'parent')
 
       assert.deepEqual(notifiedItems, [ {
-        id: 'id',
+        id: 'temp_id',
         parentId: 'parent',
         progress: Progress.NotStarted,
         title: 'title',
@@ -30,12 +30,34 @@ describe(ItemCache.name, () => {
       } ])
     })
 
+    it('notifies the returned id', async () => {
+      let notifiedItems: ItemDTO[] = []
+
+      backend.idToReturn = 'id'
+
+      const cache = newCache('temp_id')
+      cache.on(ItemCacheEvent.IdChanged, (items) => {
+        notifiedItems = items
+      })
+
+      await cache.addItem(ItemType.Feature, 'title', 'parent')
+
+      assert.deepEqual(notifiedItems[0] as any, {
+        id: 'temp_id',
+        newId: 'id',
+        parentId: 'parent',
+        progress: Progress.NotStarted,
+        title: 'title',
+        type: ItemType.Feature,
+      })
+    })
+
     it('notifies if the parent changed', async () => {
       let notifiedItems: ItemDTO[] = []
 
       backend.idToReturn = 'id'
 
-      const cache = new ItemCache(backend)
+      const cache = newCache()
       cache.cacheItem(CachedItem.item({
         id: 'epic',
         progress: Progress.NotStarted,
@@ -59,7 +81,7 @@ describe(ItemCache.name, () => {
     it('sends the correct properties to the backend', async () => {
       backend.idToReturn = 'id'
 
-      const cache = new ItemCache(backend)
+      const cache = newCache()
       await cache.addItem(ItemType.Feature, 'MMF Title', 'epic')
 
       assert.equal(backend.lastAddedParentId, 'epic')
@@ -70,7 +92,7 @@ describe(ItemCache.name, () => {
     it('triggers changed event if backend stores other data', async () => {
       backend.idToReturn = 'id'
       backend.itemsToReturn = [ {
-        id: 'id',
+        id: 'temp_id',
         progress: Progress.NotStarted,
         title: '',
         type: ItemType.Feature,
@@ -78,7 +100,7 @@ describe(ItemCache.name, () => {
 
       let notifiedItems: ItemDTO[] = []
 
-      const cache = new ItemCache(backend)
+      const cache = newCache('temp_id')
       cache.on(ItemCacheEvent.ItemsChanged, (items) => {
         notifiedItems = items
       })
@@ -93,7 +115,7 @@ describe(ItemCache.name, () => {
       backend.idToReturn = 'id'
       let notifiedItems: ItemDTO[] = []
 
-      const cache = new ItemCache(backend)
+      const cache = newCache()
       cache.on(ItemCacheEvent.ItemsRemoved, (items) => {
         notifiedItems = items
       })
@@ -118,7 +140,7 @@ describe(ItemCache.name, () => {
       backend.idToReturn = 'id'
       backend.itemsToReturn = []
 
-      const cache = new ItemCache(backend)
+      const cache = newCache()
       cache.on(ItemCacheEvent.ItemsRemoved, () => {
         assert.fail('Item should not be removed if it is not yet known to exist')
       })
@@ -133,7 +155,7 @@ describe(ItemCache.name, () => {
       backend.idToReturn = 'id'
       backend.itemsToReturn = []
 
-      const cache = new ItemCache(backend)
+      const cache = newCache()
       cache.on(ItemCacheEvent.ItemsRemoved, (items) => {
         notifiedItems = items
       })
@@ -143,5 +165,9 @@ describe(ItemCache.name, () => {
 
       assert.lengthOf(notifiedItems, 0)
     })
+
+    function newCache(nextTempId: string = 'some_id') {
+      return new ItemCache(backend, () => nextTempId)
+    }
   })
 })

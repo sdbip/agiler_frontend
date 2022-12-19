@@ -26,13 +26,14 @@ export enum ItemCacheEvent {
   ItemsAdded = 'items_added',
   ItemsRemoved = 'items_removed',
   ItemsChanged = 'items_changed',
+  IdChanged = "id_changed"
 }
 
 export class ItemCache {
   private handlers: { [_ in ItemCacheEvent]?: Handler[] } = {}
   private itemsByParent: { [id: string]: CachedItem[] } = {}
 
-  constructor(private readonly backend: Backend) { }
+  constructor(private readonly backend: Backend, private readonly nextTempId: () => string) { }
 
   async fetchItems(storyId: string | undefined, types: ItemType[]) {
     const items = await this.backend.fetchItems(storyId, types)
@@ -47,9 +48,8 @@ export class ItemCache {
   }
 
   async addItem(type: ItemType, title: string, parentId?: string) {
-    const response = await this.backend.addItem(title, type, parentId)
     const item: ItemDTO = {
-      id: response.id,
+      id: this.nextTempId(),
       progress: Progress.NotStarted,
       title,
       parentId,
@@ -59,6 +59,8 @@ export class ItemCache {
     this.notify(ItemCacheEvent.ItemsAdded, [ item ])
 
     if (parentId) this.updateItem(parentId, item => ({ ...item, type: ItemType.Epic }))
+    const response = await this.backend.addItem(title, type, parentId)
+    this.updateItemId(item, response.id)
   }
 
   async promoteTask(id: string) {
@@ -69,6 +71,19 @@ export class ItemCache {
   async completeTask(id: string) {
     await this.backend.completeTask(id)
     this.updateItem(id, item => ({ ...item, progress: Progress.Completed }))
+  }
+
+  private updateItemId(item: ItemDTO, newId: string) {
+    const cachedItem = Object.values(this.itemsByParent).flat().find(i => i.item.id === item.id)
+    if (!cachedItem) throw new Error("Item hasn't been cached")
+
+    const items = this.getItems(item.parentId)
+    if (!items) throw new Error("Item hasn't been cached")
+
+    const index = items.indexOf(cachedItem)
+    const changedItem = { ...cachedItem, id: newId }
+    items[index] = changedItem
+    this.notify(ItemCacheEvent.IdChanged, [ { ...item, newId } as ItemDTO ])
   }
 
   private updateItem(id: string, applyChanges: (_: ItemDTO) => ItemDTO) {

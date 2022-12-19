@@ -15,7 +15,9 @@ import { ItemType } from '../backend/dtos.js'
   updateItems()
 })()
 
-const cache = new ItemCache(new Backend())
+let temp_id = 1
+const nextId = () => `new_${++temp_id}`
+const cache = new ItemCache(new Backend(), nextId)
 
 // EVENT HANDLERS
 

@@ -8,7 +8,7 @@ describe(`${ItemCache.name}.promoteTask`, () => {
   const backend = new MockBackend()
 
   it('forwards to the backend', async () => {
-    const cache = new ItemCache(backend)
+    const cache = newCache()
     await cache.promoteTask('task')
     assert.equal(backend.lastPromotedId, 'task')
   })
@@ -16,7 +16,7 @@ describe(`${ItemCache.name}.promoteTask`, () => {
   it('notifies that the item is now a Story', async () => {
     let notifiedItems: ItemDTO[] = []
 
-    const cache = new ItemCache(backend)
+    const cache = newCache()
     cache.cacheItem(CachedItem.item({
       id: 'task',
       progress: Progress.NotStarted,
@@ -30,4 +30,8 @@ describe(`${ItemCache.name}.promoteTask`, () => {
     await cache.promoteTask('task')
     assert.deepEqual(notifiedItems.map(i => ({ id: i.id, type: i.type })), [ { id: 'task', type: ItemType.Story } ])
   })
+
+  function newCache() {
+    return new ItemCache(backend, () => 'some_id')
+  }
 })
