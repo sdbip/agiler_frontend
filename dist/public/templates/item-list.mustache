@@ -1,24 +1,24 @@
 {{#items}}
 <div id="item-{{id}}" data-id="{{id}}" data-type="{{type}}" class="item no-select">
   {{#canPromote}}
-  <span class="promote-button" onclick="emitUIEvent('promote-clicked', {element: this, event, itemId: '{{id}}'})">✵</span>
+  <span class="promote-button" onclick="emitUIEvent('promote-clicked', {element: this, event})">✵</span>
   {{/canPromote}}
   {{#canComplete}}
-  <label onclick="emitUIEvent('complete-clicked', {element: this, event, itemId: '{{id}}'})"></label>
+  <label onclick="emitUIEvent('complete-clicked', {element: this, event})"></label>
   {{/canComplete}}
   <span class="title">{{title}}{{#isEpic}} <sup>EPIC</sup>{{/isEpic}}</span>
   {{#hasChildren}}
   <div class="chevron">+</div>
-  <div class="disclosure-button" onclick="emitUIEvent('disclosure-button-clicked', {element: this, event, itemId: '{{id}}'})"></div>
+  <div class="disclosure-button" onclick="emitUIEvent('disclosure-button-clicked', {element: this, event})"></div>
   <img class="spinner inactive" src="/public/images/spinner.gif">
   <div class="collapsible" style="height: 0">
     <div class="flex">
       <input type="text" class="item-title"
-        onfocus="emitUIEvent('focus', {element: this, event, itemId: '{{id}}'})"
-        oninput="emitUIEvent('input', {element: this, event, itemId: '{{id}}'})"
-        onblur="emitUIEvent('blur', {element: this, event, itemId: '{{id}}'})"
-        onkeydown="emitUIEvent('title-keydown', {element: this, event, itemId: '{{id}}'})" placeholder="What needs to be done?">
-      <div class="add-button" onclick="emitUIEvent('add-button-clicked', {element: this, event, itemId: '{{id}}'})">+</div>
+        onfocus="emitUIEvent('focus', {element: this, event})"
+        oninput="emitUIEvent('input', {element: this, event})"
+        onblur="emitUIEvent('blur', {element: this, event})"
+        onkeydown="emitUIEvent('title-keydown', {element: this, event})" placeholder="What needs to be done?">
+      <div class="add-button" onclick="emitUIEvent('add-button-clicked', {element: this, event})">+</div>
     </div>
     <div class="item-list"></div>
   </div>

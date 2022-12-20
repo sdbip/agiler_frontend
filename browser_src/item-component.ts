@@ -24,14 +24,7 @@ export enum ItemComponentEvent {
 export class ItemComponent {
 
   get parentComponent() {
-    const getComponent = (element: DOMElement | null): ItemComponent | null => {
-      if (!element) return null
-      if (element.id.startsWith('item-') &&
-        !element.id.startsWith('item-list')) return new ItemComponent(element)
-      return getComponent(element.parentElement)
-    }
-
-    return getComponent(this.element.parentElement)
+    return ItemComponent.parentComponent(this.element.parentElement)
   }
 
   get itemId() {
@@ -60,6 +53,13 @@ export class ItemComponent {
     return element && new ItemComponent(element)
   }
   private constructor(readonly element: DOMElement) { }
+
+  static parentComponent(element: DOMElement | null): ItemComponent | null {
+      if (!element) return null
+      if (element.id.startsWith('item-') &&
+        !element.id.startsWith('item-list')) return new ItemComponent(element)
+      return this.parentComponent(element.parentElement)
+  }
 
   private getElement(selector: Selector) {
     return DOMElement.single(selector, this.element)

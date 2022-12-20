@@ -43,31 +43,33 @@ cache.on(ItemCacheEvent.ItemsRemoved, items => {
 })
 
 globals.emitUIEvent = async (name: string, args: UIEventArgs) => {
+  const element = new DOMElement(args.element)
+  const component = ItemComponent.parentComponent(element)
   switch (name) {
     case 'help-mouseover': {
-      const popup = await Popup.forSnippet(args.element.dataset.snippet)
+      const popup = await Popup.forSnippet(element.getData('snippet'))
       popup.showNear(new DOMElement(args.element))
       break
     }
     case 'help-mouseout': {
-      const popup = await Popup.forSnippet(args.element.dataset.snippet)
+      const popup = await Popup.forSnippet(element.getData('snippet'))
       popup?.hide()
       break
     }
     case 'focus':
     case 'input':
     case 'blur':
-      notifyUI(name as ItemComponentEvent, args.itemId, args)
+      notifyUI(name as ItemComponentEvent, args.element.dataset.id, args)
       break
     case 'title-keydown':
       if (isEnterPressed(args.event as KeyboardEvent))
-        await addFeature({ id: args.itemId })
+        await addFeature({ id: component?.itemId as string })
       break
     case 'add-button-clicked':
-      await addFeature({ id: args.itemId })
+      await addFeature({ id: component?.itemId as string })
       break
     case 'disclosure-button-clicked':
-      await toggleDisclosed({ id: args.itemId })
+      await toggleDisclosed({ id: args.element.dataset.id as string })
       break
   }
 
