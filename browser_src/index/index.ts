@@ -1,5 +1,5 @@
 import globals from '../globals.js'
-import { ItemComponent } from '../item-component.js'
+import { ItemComponent, ItemComponentEvent } from '../item-component.js'
 import { PageComponent } from '../page-component.js'
 import { ClassName } from '../class-name.js'
 import { UIEventArgs } from './ui-event-args.js'
@@ -22,17 +22,17 @@ const cache = new ItemCache(new Backend(), nextId)
 // EVENT HANDLERS
 
 cache.on(ItemCacheEvent.ItemsAdded, items => {
-  notifyUI('items_added', items[0].parentId, { items })
+  notifyUI(ItemComponentEvent.ItemsAdded, items[0].parentId, { items })
 })
 
 cache.on(ItemCacheEvent.ItemsChanged, items => {
   for (const item of items)
-    notifyUI('item_changed', item.id, { item })
+    notifyUI(ItemComponentEvent.ItemChanged, item.id, { item })
 })
 
 cache.on(ItemCacheEvent.ItemsRemoved, items => {
   for (const item of items)
-    notifyUI('item_removed', item.id, { item })
+    notifyUI(ItemComponentEvent.ItemRemoved, item.id, { item })
 })
 
 globals.emitUIEvent = async (name: string, args: UIEventArgs) => {
@@ -40,7 +40,7 @@ globals.emitUIEvent = async (name: string, args: UIEventArgs) => {
     case 'focus':
     case 'input':
     case 'blur':
-      notifyUI(name, args.itemId, args)
+      notifyUI(name as ItemComponentEvent, args.itemId, args)
       break
     case 'complete-clicked':
       await completeTask({ id: args.itemId })
@@ -66,7 +66,7 @@ globals.emitUIEvent = async (name: string, args: UIEventArgs) => {
   }
 }
 
-function notifyUI(event: string, itemId?: string, args?: any) {
+function notifyUI(event: ItemComponentEvent, itemId?: string, args?: any) {
   const component = (itemId ? ItemComponent.forId(itemId) : undefined) ?? PageComponent.instance
   component.handleUIEvent(event, args)
 }
@@ -98,16 +98,16 @@ const toggleDisclosed = async ({ id }: { id: string }) => {
 
   const wasDisclosed = storyComponent.element.hasClass(ClassName.disclosed)
   if (!wasDisclosed) await updateItems(id)
-  notifyUI(wasDisclosed ? 'collapse' : 'disclose', id)
+  notifyUI(wasDisclosed ? ItemComponentEvent.Collapse : ItemComponentEvent.Disclose, id)
 }
 
 // END EVENT HANDLERS
 
 async function updateItems(storyId?: string) {
-  notifyUI('loading', storyId)
+  notifyUI(ItemComponentEvent.Loading, storyId)
   try {
     await cache.fetchItems(storyId, [ ItemType.Story, ItemType.Task ])
   } finally {
-    notifyUI('loading-done', storyId)
+    notifyUI(ItemComponentEvent.LoadingDone, storyId)
   }
 }

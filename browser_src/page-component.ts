@@ -3,6 +3,7 @@ import { failFast } from './fail-fast.js'
 import { ClassName, Selector } from './class-name.js'
 import { DOMElement } from './dom-element.js'
 import { render } from './templates.js'
+import { ItemComponentEvent } from './item-component.js'
 
 export class PageComponent {
   static instance = new PageComponent()
@@ -28,19 +29,19 @@ export class PageComponent {
     return DOMElement.single(selector)
   }
 
-  async handleUIEvent(name: string, args: any) {
+  async handleUIEvent(name: ItemComponentEvent, args: any) {
     switch (name) {
-      case 'focus':
-      case 'input':
+      case ItemComponentEvent.Focus:
+      case ItemComponentEvent.Input:
         if (this.title)
           this.highlightAddButton()
         else
           this.unhighlightAddButton()
         break
-      case 'blur':
+      case ItemComponentEvent.Blur:
         this.unhighlightAddButton()
         break
-      case 'items_added':
+      case ItemComponentEvent.ItemsAdded:
         await this.addComponents(args.items)
         break
     }
