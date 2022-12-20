@@ -23,8 +23,13 @@ const cache = new ItemCache(new Backend(), nextId)
 
 // EVENT HANDLERS
 
+// TODO: This is not good: It's untested. It's repeated in index.ts. And it's not trivially correct.
 cache.on(ItemCacheEvent.ItemsAdded, items => {
   notifyUI(ItemComponentEvent.ItemsAdded, items[0].parentId, { items })
+})
+
+cache.on(ItemCacheEvent.IdChanged, items => {
+  notifyUI(ItemComponentEvent.IdChanged, items[0].id, (items[0] as any).newId)
 })
 
 cache.on(ItemCacheEvent.ItemsChanged, items => {

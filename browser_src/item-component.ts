@@ -16,6 +16,7 @@ export enum ItemComponentEvent {
   ItemsAdded = 'items_added',
   ItemChanged = 'item_changed',
   ItemRemoved = 'item_removed',
+  IdChanged = 'id_changed',
   Disclose = 'disclose',
   Collapse = 'collapse',
 }
@@ -102,8 +103,8 @@ export class ItemComponent {
         this.element.remove()
         break
       case ItemComponentEvent.IdChanged:
-        // this.element.id = item-${args[0].id}
-        // this.element['data-id'] = args[0].id
+        this.element.element.id = `item-${args}`
+        this.element.setData('id', args)
         break
       case ItemComponentEvent.Collapse:
         this.collapse()

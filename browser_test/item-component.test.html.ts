@@ -73,9 +73,20 @@ runTests(() => {
       assert.exists(spinnerElement, 'spinnerElement')
     })
 
+    afterEach(() => {
+      storyElement.id = 'item-story'
+      storyElement.setAttribute('data-id', 'story')
+    })
+
     it('gets its title from the title element', () => {
       titleInputElement.value = 'This is a title'
       assert.equal(storyComponent?.title, 'This is a title')
+    })
+
+    it('updates the id when it changes', () => {
+      storyComponent.handleUIEvent(ItemComponentEvent.IdChanged, 'new_id')
+      assert.equal(storyElement.id, 'item-new_id')
+      assert.equal(storyElement.dataset.id, 'new_id')
     })
 
     describe('add-button styling', () => {
