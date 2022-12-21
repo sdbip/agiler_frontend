@@ -81,7 +81,7 @@ export class ItemCache {
     if (!items) throw new Error("Item hasn't been cached")
 
     const index = items.indexOf(cachedItem)
-    const changedItem = { ...cachedItem, id: newId }
+    const changedItem = CachedItem.unverified({ ...cachedItem.item, id: newId })
     items[index] = changedItem
     this.notify(ItemCacheEvent.IdChanged, [ { ...item, newId } as ItemDTO ])
   }

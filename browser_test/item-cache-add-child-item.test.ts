@@ -92,7 +92,7 @@ describe(ItemCache.name, () => {
     it('triggers changed event if backend stores other data', async () => {
       backend.idToReturn = 'id'
       backend.itemsToReturn = [ {
-        id: 'temp_id',
+        id: 'id',
         progress: Progress.NotStarted,
         title: '',
         type: ItemType.Feature,
@@ -100,7 +100,7 @@ describe(ItemCache.name, () => {
 
       let notifiedItems: ItemDTO[] = []
 
-      const cache = newCache('temp_id')
+      const cache = newCache()
       cache.on(ItemCacheEvent.ItemsChanged, (items) => {
         notifiedItems = items
       })
