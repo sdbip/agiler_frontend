@@ -64,13 +64,13 @@ export class ItemCache {
   }
 
   async promoteTask(id: string) {
-    await this.backend.promoteTask(id)
     this.updateItem(id, item => ({ ...item, type: ItemType.Story }))
+    await this.backend.promoteTask(id)
   }
 
   async completeTask(id: string) {
-    await this.backend.completeTask(id)
     this.updateItem(id, item => ({ ...item, progress: Progress.Completed }))
+    await this.backend.completeTask(id)
   }
 
   private updateItemId(item: ItemDTO, newId: string) {
