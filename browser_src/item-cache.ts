@@ -74,7 +74,7 @@ export class ItemCache {
   }
 
   private updateItemId(item: ItemDTO, newId: string) {
-    const cachedItem = Object.values(this.itemsByParent).flat().find(i => i.item.id === item.id)
+    const cachedItem = this.getCachedItem(item.id)
     if (!cachedItem) throw new Error("Item hasn't been cached")
 
     const items = this.getItems(item.parentId)
@@ -87,7 +87,7 @@ export class ItemCache {
   }
 
   private updateItem(id: string, applyChanges: (_: ItemDTO) => ItemDTO) {
-    const cachedItem = Object.values(this.itemsByParent).flat().find(i => i.item.id === id)
+    const cachedItem = this.getCachedItem(id)
     if (!cachedItem) return
 
     const items = this.getItems(cachedItem.item.parentId)
@@ -127,6 +127,10 @@ export class ItemCache {
 
     for (const handler of handlers)
       handler(items)
+  }
+
+  getCachedItem(id: string): CachedItem | undefined {
+    return Object.values(this.itemsByParent).flat().find(i => i.item.id === id)
   }
 
   private getItems(parentId: string | undefined): CachedItem[] | undefined {
