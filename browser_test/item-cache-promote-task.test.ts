@@ -27,6 +27,6 @@ describe(`${ItemCache.name}.promoteTask`, () => {
   })
 
   function newCache() {
-    return new ItemCache(backend, () => 'some_id')
+    return new ItemCache(backend)
   }
 })

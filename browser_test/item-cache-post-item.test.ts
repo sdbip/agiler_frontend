@@ -69,7 +69,7 @@ describe(ItemCache.name, () => {
     })
 
     function newCache(nextTempId: string = 'some_id') {
-      return new ItemCache(backend, () => nextTempId)
+      return new ItemCache(backend, { next: () => nextTempId })
     }
   })
 })

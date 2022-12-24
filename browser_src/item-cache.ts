@@ -1,4 +1,5 @@
 import { ItemDTO, ItemType, Progress } from './backend/dtos.js'
+import { IDGenerator as IDGeneratorImpl } from './id-generator.js'
 
 export class CachedItem {
   private constructor(readonly item: ItemDTO, readonly unverified: boolean) { }
@@ -29,11 +30,15 @@ export enum ItemCacheEvent {
   IdChanged = "id_changed"
 }
 
+interface IDGenerator {
+  next(): string
+}
+
 export class ItemCache {
   private handlers: { [_ in ItemCacheEvent]?: Handler[] } = {}
   private itemsByParent: { [id: string]: CachedItem[] } = {}
 
-  constructor(private readonly backend: Backend, private readonly nextTempId: () => string) { }
+  constructor(private readonly backend: Backend, private readonly idGenerator: IDGenerator = new IDGeneratorImpl()) { }
 
   async fetchItems(storyId: string | undefined, types: ItemType[]) {
     const items = await this.backend.fetchItems(storyId, types)
@@ -49,7 +54,7 @@ export class ItemCache {
 
   async addItem(type: ItemType, title: string, parentId?: string) {
     const item: ItemDTO = {
-      id: this.nextTempId(),
+      id: this.idGenerator.next(),
       progress: Progress.NotStarted,
       title,
       parentId,
