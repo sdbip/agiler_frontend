@@ -13,7 +13,7 @@ describe(`${ItemCache.name}.promoteTask`, () => {
     assert.equal(backend.lastPromotedId, 'task')
   })
 
-  it('notifies that the item is now a Story', async () => {
+  it('immediately notifies that the item is now a Story', async () => {
     let notifiedItems: ItemDTO[] = []
 
     const cache = newCache()
@@ -27,8 +27,10 @@ describe(`${ItemCache.name}.promoteTask`, () => {
       notifiedItems = items
     })
 
-    await cache.promoteTask('task')
-    assert.deepEqual(notifiedItems.map(i => ({ id: i.id, type: i.type })), [ { id: 'task', type: ItemType.Story } ])
+    /* do not await */ cache.promoteTask('task')
+    assert.lengthOf(notifiedItems, 1)
+    assert.equal(notifiedItems[0].id, 'task')
+    assert.equal(notifiedItems[0].type, ItemType.Story)
   })
 
   function newCache() {

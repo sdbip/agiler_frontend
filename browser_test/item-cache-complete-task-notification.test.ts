@@ -13,7 +13,7 @@ describe(`${ItemCache.name}.completeTask`, () => {
     assert.equal(backend.lastCompletedId, 'task')
   })
 
-  it('notifies that the item is now a Story', async () => {
+  it('immediately notifies that the item is now a Story', async () => {
     let notifiedItems: ItemDTO[] = []
 
     const cache = newCache()
@@ -27,8 +27,10 @@ describe(`${ItemCache.name}.completeTask`, () => {
       notifiedItems = items
     })
 
-    await cache.completeTask('task')
-    assert.deepEqual(notifiedItems.map(i => ({ id: i.id, progress: i.progress })), [ { id: 'task', progress: Progress.Completed } ])
+    /* do not await */ cache.completeTask('task')
+    assert.lengthOf(notifiedItems, 1)
+    assert.equal(notifiedItems[0].id, 'task')
+    assert.equal(notifiedItems[0].progress, Progress.Completed)
   })
 
   function newCache() {
