@@ -16,9 +16,7 @@ import { DOMElement } from '../dom-element.js'
   updateItems()
 })()
 
-let temp_id = 1
-const nextId = () => `new_${++temp_id}`
-const cache = new ItemCache(new Backend(), nextId)
+const cache = new ItemCache(new Backend())
 
 // EVENT HANDLERS
 

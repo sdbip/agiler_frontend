@@ -221,6 +221,6 @@ describe(`${ItemCache.name}.fetchItems`, () => {
   })
 
   function newCache() {
-    return new ItemCache(backend, () => 'some_id')
+    return new ItemCache(backend)
   }
 })

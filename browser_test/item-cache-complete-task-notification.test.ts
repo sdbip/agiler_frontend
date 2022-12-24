@@ -13,7 +13,9 @@ describe(`${ItemCache.name}.completeTask`, () => {
     assert.equal(backend.lastCompletedId, 'task')
   })
 
-  it('updates the cached item without wait', async () => {
+  it('immediately notifies that the item is now a Story', async () => {
+    let notifiedItems: ItemDTO[] = []
+
     const cache = newCache()
     cache.cacheItem(CachedItem.item({
       id: 'task',
@@ -21,9 +23,14 @@ describe(`${ItemCache.name}.completeTask`, () => {
       title: 'Complete Me',
       type: ItemType.Task,
     }))
+    cache.on(ItemCacheEvent.ItemsChanged, items => {
+      notifiedItems = items
+    })
 
     /* do not await */ cache.completeTask('task')
-    assert.equal(cache.getCachedItem('task')?.item.progress, Progress.Completed)
+    assert.lengthOf(notifiedItems, 1)
+    assert.equal(notifiedItems[0].id, 'task')
+    assert.equal(notifiedItems[0].progress, Progress.Completed)
   })
 
   function newCache() {
