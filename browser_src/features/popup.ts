@@ -4,7 +4,7 @@ import { DOMElement } from '../dom-element.js'
 export class Popup {
   constructor(readonly element: DOMElement) { }
 
-  static async forSnippet(snippet: string | undefined) {
+  static async forSnippet(snippet: string | null) {
     const existingPopupElement = DOMElement.single({ id: `popup:${snippet}` })
     const popupElement = existingPopupElement
       ?? DOMElement.fromHTML(`<div id="popup:${snippet}" class="pop-up"></div>`)

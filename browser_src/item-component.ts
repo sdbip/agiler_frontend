@@ -7,17 +7,24 @@ import { MeasureComponent } from './measure-component.js'
 import { delay } from './delay.js'
 import { render } from './templates.js'
 
+export enum ItemComponentEvent {
+  Focus = 'focus',
+  Input = 'input',
+  Blur = 'blur',
+  Loading = 'loading',
+  LoadingDone = 'loading-done',
+  ItemsAdded = 'items_added',
+  ItemChanged = 'item_changed',
+  ItemRemoved = 'item_removed',
+  IdChanged = 'id_changed',
+  Disclose = 'disclose',
+  Collapse = 'collapse',
+}
+
 export class ItemComponent {
 
   get parentComponent() {
-    const getComponent = (element: DOMElement | null): ItemComponent | null => {
-      if (!element) return null
-      if (element.id.startsWith('item-') &&
-        !element.id.startsWith('item-list')) return new ItemComponent(element)
-      return getComponent(element.parentElement)
-    }
-
-    return getComponent(this.element.parentElement)
+    return ItemComponent.parentComponent(this.element.parentElement)
   }
 
   get itemId() {
@@ -47,6 +54,13 @@ export class ItemComponent {
   }
   private constructor(readonly element: DOMElement) { }
 
+  static parentComponent(element: DOMElement | null): ItemComponent | null {
+      if (!element) return null
+      if (element.id.startsWith('item-') &&
+        !element.id.startsWith('item-list')) return new ItemComponent(element)
+      return this.parentComponent(element.parentElement)
+  }
+
   private getElement(selector: Selector) {
     return DOMElement.single(selector, this.element)
   }
@@ -59,39 +73,43 @@ export class ItemComponent {
     }
   }
 
-  async handleUIEvent(name: string, args?: any) {
+  async handleUIEvent(name: ItemComponentEvent, args?: any) {
     switch (name) {
-      case 'focus':
-      case 'input':
+      case ItemComponentEvent.Focus:
+      case ItemComponentEvent.Input:
         if (this.title)
           this.highlightAddButton()
         else
           this.unhighlightAddButton()
         break
-      case 'blur':
+      case ItemComponentEvent.Blur:
         this.unhighlightAddButton()
         break
-      case 'loading':
+      case ItemComponentEvent.Loading:
         this.startSpinner()
         break
-      case 'loading-done':
+      case ItemComponentEvent.LoadingDone:
         this.stopSpinner()
         break
-      case 'items_added':
+      case ItemComponentEvent.ItemsAdded:
         await this.addComponents(args.items)
         break
-      case 'item_changed':
+      case ItemComponentEvent.ItemChanged:
         this.updateDetails(args)
         break
-      case 'item_removed':
+      case ItemComponentEvent.ItemRemoved:
         this.element.addClass(ClassName.hidden)
         await delay(200)
         this.element.remove()
         break
-      case 'collapse':
+      case ItemComponentEvent.IdChanged:
+        this.element.element.id = `item-${args}`
+        this.element.setData('id', args)
+        break
+      case ItemComponentEvent.Collapse:
         this.collapse()
         break
-      case 'disclose':
+      case ItemComponentEvent.Disclose:
         this.disclose()
         break
     }

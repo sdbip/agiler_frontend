@@ -1,6 +1,6 @@
 import { runTests } from '@web/test-runner-mocha'
 import { assert } from '@esm-bundle/chai'
-import { ItemComponent } from '../browser_src/item-component.js'
+import { ItemComponent, ItemComponentEvent } from '../browser_src/item-component.js'
 import { render, setBaseURL } from '../browser_src/templates.js'
 import { PageComponent } from '../browser_src/page-component.js'
 import { ClassName } from '../browser_src/class-name.js'
@@ -73,9 +73,20 @@ runTests(() => {
       assert.exists(spinnerElement, 'spinnerElement')
     })
 
+    afterEach(() => {
+      storyElement.id = 'item-story'
+      storyElement.setAttribute('data-id', 'story')
+    })
+
     it('gets its title from the title element', () => {
       titleInputElement.value = 'This is a title'
       assert.equal(storyComponent?.title, 'This is a title')
+    })
+
+    it('updates the id when it changes', () => {
+      storyComponent.handleUIEvent(ItemComponentEvent.IdChanged, 'new_id')
+      assert.equal(storyElement.id, 'item-new_id')
+      assert.equal(storyElement.dataset.id, 'new_id')
     })
 
     describe('add-button styling', () => {
@@ -88,19 +99,19 @@ runTests(() => {
         })
 
         it('highlights add-button when receiving focus event', () => {
-          storyComponent.handleUIEvent('focus', undefined)
+          storyComponent.handleUIEvent(ItemComponentEvent.Focus, undefined)
           assert.isTrue(addButtonElement.hasClass(ClassName.default))
         })
 
         it('highlights add-button when receiving input event', () => {
-          storyComponent.handleUIEvent('input', undefined)
+          storyComponent.handleUIEvent(ItemComponentEvent.Input, undefined)
           assert.isTrue(addButtonElement.hasClass(ClassName.default))
         })
 
         it('does not highlight button if title is empty', () => {
           titleInputElement.value = ''
-          storyComponent.handleUIEvent('focus', undefined)
-          storyComponent.handleUIEvent('input', undefined)
+          storyComponent.handleUIEvent(ItemComponentEvent.Focus, undefined)
+          storyComponent.handleUIEvent(ItemComponentEvent.Input, undefined)
           assert.isFalse(addButtonElement.hasClass(ClassName.default))
         })
       })
@@ -114,14 +125,14 @@ runTests(() => {
         it('unhighlights button if title becomes empty', () => {
           titleInputElement.value = ''
 
-          storyComponent?.handleUIEvent('input', undefined)
+          storyComponent?.handleUIEvent(ItemComponentEvent.Input, undefined)
           assert.isFalse(addButtonElement.hasClass(ClassName.default))
         })
 
         it('unhighlights button when receiving blur event', () => {
           titleInputElement.value = 'not empty'
 
-          storyComponent?.handleUIEvent('blur', undefined)
+          storyComponent?.handleUIEvent(ItemComponentEvent.Blur, undefined)
           assert.isFalse(addButtonElement.hasClass(ClassName.default))
         })
       })
@@ -146,44 +157,44 @@ runTests(() => {
         ]
 
         // TODO: This waits for a .5s animation
-        await storyComponent.handleUIEvent('items_added', { items })
+        await storyComponent.handleUIEvent(ItemComponentEvent.ItemsAdded, { items })
         assert.exists(ItemComponent.forId('subtask'), 'sutask component should exist after adding items')
         assert.equal(itemListElement.childElementCount, 1)
       })
 
       it('starts the spinner', () => {
         spinnerElement.addClass(ClassName.inactive)
-        storyComponent.handleUIEvent('loading')
+        storyComponent.handleUIEvent(ItemComponentEvent.Loading)
         assert.isFalse(spinnerElement.hasClass(ClassName.inactive))
       })
 
       it('stops the spinner', () => {
         spinnerElement.removeClass(ClassName.inactive)
-        storyComponent.handleUIEvent('loading-done')
+        storyComponent.handleUIEvent(ItemComponentEvent.LoadingDone)
         assert.isTrue(spinnerElement.hasClass(ClassName.inactive))
       })
 
       it('styles element when disclosing subtasks', () => {
         storyComponent.element.removeClass(ClassName.disclosed)
-        storyComponent.handleUIEvent('disclose')
+        storyComponent.handleUIEvent(ItemComponentEvent.Disclose)
         assert.isTrue(storyComponent.element.hasClass(ClassName.disclosed))
       })
 
       it('styles element when collapsing the subtasks', () => {
         storyComponent.element.addClass(ClassName.disclosed)
-        storyComponent.handleUIEvent('collapse')
+        storyComponent.handleUIEvent(ItemComponentEvent.Collapse)
         assert.isFalse(storyComponent.element.hasClass(ClassName.disclosed))
       })
 
       it('discloses collapsible pane', () => {
         collapsibleElement.style.height = '0'
-        storyComponent.handleUIEvent('disclose')
+        storyComponent.handleUIEvent(ItemComponentEvent.Disclose)
         assert.equal(collapsibleElement.style.height, '28px')
       })
 
       it('collapses the collapsible pane', () => {
         collapsibleElement.style.height = '43px'
-        storyComponent.handleUIEvent('collapse')
+        storyComponent.handleUIEvent(ItemComponentEvent.Collapse)
         assert.equal(collapsibleElement.style.height, '0px')
       })
     })
@@ -192,7 +203,7 @@ runTests(() => {
   describe('Subtask component', () => {
     before(async () => {
       const storyComponent = ItemComponent.forId('story')
-      await storyComponent?.handleUIEvent('items_added', { items: [ {
+      await storyComponent?.handleUIEvent(ItemComponentEvent.ItemsAdded, { items: [ {
         id: 'subtask',
         progress: 'notStarted',
         title: 'Perform subtask',
@@ -225,5 +236,5 @@ async function renderPageComponent() {
 
 async function renderItems(items: any[]) {
   // TODO: This waits for a .5s animation
-  await PageComponent.instance.handleUIEvent('items_added', { items })
+  await PageComponent.instance.handleUIEvent(ItemComponentEvent.ItemsAdded, { items })
 }

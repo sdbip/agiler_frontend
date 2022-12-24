@@ -1,6 +1,6 @@
 import { assert } from '@esm-bundle/chai'
 import { ItemDTO, ItemType, Progress } from '../browser_src/backend/dtos.js'
-import { ItemCache, ItemCacheEvent } from '../browser_src/item-cache.js'
+import { CachedItem, ItemCache, ItemCacheEvent } from '../browser_src/item-cache.js'
 import { MockBackend } from './mocks'
 
 describe(`${ItemCache.name}.fetchItems`, () => {
@@ -18,7 +18,7 @@ describe(`${ItemCache.name}.fetchItems`, () => {
       }
       backend.itemsToReturn = [ item ]
 
-      const cache = new ItemCache(backend)
+      const cache = newCache()
 
       let notifiedItems: ItemDTO[] = []
       cache.on(ItemCacheEvent.ItemsAdded, (items) => {
@@ -46,8 +46,8 @@ describe(`${ItemCache.name}.fetchItems`, () => {
       }
       backend.itemsToReturn = [ item1, item2 ]
 
-      const cache = new ItemCache(backend)
-      cache.cacheItem(item1)
+      const cache = newCache()
+      cache.cacheItem(CachedItem.item(item1))
 
       let notifiedItems: ItemDTO[] = []
       cache.on(ItemCacheEvent.ItemsAdded, items => {
@@ -67,8 +67,8 @@ describe(`${ItemCache.name}.fetchItems`, () => {
       }
       backend.itemsToReturn = [ item ]
 
-      const cache = new ItemCache(backend)
-      cache.cacheItem(item)
+      const cache = newCache()
+      cache.cacheItem(CachedItem.item(item))
 
       let isNotified = false
       cache.on(ItemCacheEvent.ItemsAdded, () => { isNotified = true })
@@ -89,7 +89,7 @@ describe(`${ItemCache.name}.fetchItems`, () => {
         type: ItemType.Task,
       } ]
 
-      const cache = new ItemCache(backend)
+      const cache = newCache()
 
       let isNotified = false
       cache.on(ItemCacheEvent.ItemsChanged, () => {
@@ -109,8 +109,8 @@ describe(`${ItemCache.name}.fetchItems`, () => {
       }
       backend.itemsToReturn = [ item ]
 
-      const cache = new ItemCache(backend)
-      cache.cacheItem({ ...item, title: 'Title before' })
+      const cache = newCache()
+      cache.cacheItem(CachedItem.item({ ...item, title: 'Title before' }))
 
       let changedItems: ItemDTO[] | undefined
       cache.on(ItemCacheEvent.ItemsChanged, items => {
@@ -132,7 +132,7 @@ describe(`${ItemCache.name}.fetchItems`, () => {
         type: ItemType.Task,
       } ]
 
-      const cache = new ItemCache(backend)
+      const cache = newCache()
 
       let isNotified = false
       cache.on(ItemCacheEvent.ItemsRemoved, () => { isNotified = true })
@@ -162,7 +162,7 @@ describe(`${ItemCache.name}.fetchItems`, () => {
         parentId: 'parent',
       }
 
-      const cache = new ItemCache(backend)
+      const cache = newCache()
 
       backend.itemsToReturn = [ item1 ]
       await cache.fetchItems(undefined, [ ItemType.Task ])
@@ -188,8 +188,8 @@ describe(`${ItemCache.name}.fetchItems`, () => {
         type: ItemType.Task,
       }
 
-      const cache = new ItemCache(backend)
-      cache.cacheItem(item)
+      const cache = newCache()
+      cache.cacheItem(CachedItem.item(item))
 
       let notifiedItems: ItemDTO[] = []
       cache.on(ItemCacheEvent.ItemsRemoved, items => {
@@ -209,8 +209,8 @@ describe(`${ItemCache.name}.fetchItems`, () => {
       }
       backend.itemsToReturn = [ item1 ]
 
-      const cache = new ItemCache(backend)
-      cache.cacheItem({ ...item1, title: 'Old title' })
+      const cache = newCache()
+      cache.cacheItem(CachedItem.item({ ...item1, title: 'Old title' }))
 
       let isNotified = false
       cache.on(ItemCacheEvent.ItemsRemoved, () => { isNotified = true })
@@ -219,4 +219,8 @@ describe(`${ItemCache.name}.fetchItems`, () => {
       assert.isFalse(isNotified)
     })
   })
+
+  function newCache() {
+    return new ItemCache(backend, () => 'some_id')
+  }
 })

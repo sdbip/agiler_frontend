@@ -1,5 +1,5 @@
 import globals from '../globals.js'
-import { ItemComponent } from '../item-component.js'
+import { ItemComponent, ItemComponentEvent } from '../item-component.js'
 import { PageComponent } from '../page-component.js'
 import { ClassName } from '../class-name.js'
 import { UIEventArgs } from './ui-event-args.js'
@@ -7,6 +7,7 @@ import { render } from '../templates.js'
 import { ItemCache, ItemCacheEvent } from '../item-cache.js'
 import { Backend } from '../backend/backend.js'
 import { ItemType } from '../backend/dtos.js'
+import { DOMElement } from '../dom-element.js'
 
 (async () => {
   const pageContainer = document.getElementById('page-container')
@@ -15,46 +16,54 @@ import { ItemType } from '../backend/dtos.js'
   updateItems()
 })()
 
-const cache = new ItemCache(new Backend())
+let temp_id = 1
+const nextId = () => `new_${++temp_id}`
+const cache = new ItemCache(new Backend(), nextId)
 
 // EVENT HANDLERS
 
 cache.on(ItemCacheEvent.ItemsAdded, items => {
-  notifyUI('items_added', items[0].parentId, { items })
+  notifyUI(ItemComponentEvent.ItemsAdded, items[0].parentId, { items })
+})
+
+cache.on(ItemCacheEvent.IdChanged, items => {
+  notifyUI(ItemComponentEvent.IdChanged, items[0].id, (items[0] as any).newId)
 })
 
 cache.on(ItemCacheEvent.ItemsChanged, items => {
   for (const item of items)
-    notifyUI('item_changed', item.id, { item })
+    notifyUI(ItemComponentEvent.ItemChanged, item.id, { item })
 })
 
 cache.on(ItemCacheEvent.ItemsRemoved, items => {
   for (const item of items)
-    notifyUI('item_removed', item.id, { item })
+    notifyUI(ItemComponentEvent.ItemRemoved, item.id, { item })
 })
 
 globals.emitUIEvent = async (name: string, args: UIEventArgs) => {
+  const element = new DOMElement(args.element)
+  const component = ItemComponent.parentComponent(element)
   switch (name) {
     case 'focus':
     case 'input':
     case 'blur':
-      notifyUI(name, args.itemId, args)
+      notifyUI(name as ItemComponentEvent, component?.itemId, args)
       break
     case 'complete-clicked':
-      await completeTask({ id: args.itemId })
+      await completeTask({ id: component?.itemId as string })
       break
     case 'promote-clicked':
-      await promote({ id: args.itemId })
+      await promote({ id: component?.itemId as string })
       break
     case 'title-keydown':
       if (isEnterPressed(args.event as KeyboardEvent))
-        await addTask({ id: args.itemId })
+        await addTask({ id: component?.itemId as string })
       break
     case 'add-button-clicked':
-      await addTask({ id: args.itemId })
+      await addTask({ id: component?.itemId as string })
       break
     case 'disclosure-button-clicked':
-      await toggleDisclosed({ id: args.itemId })
+      await toggleDisclosed({ id: component?.itemId as string })
       break
   }
 
@@ -64,13 +73,12 @@ globals.emitUIEvent = async (name: string, args: UIEventArgs) => {
   }
 }
 
-function notifyUI(event: string, itemId?: string, args?: any) {
+function notifyUI(event: ItemComponentEvent, itemId?: string, args?: any) {
   const component = (itemId ? ItemComponent.forId(itemId) : undefined) ?? PageComponent.instance
   component.handleUIEvent(event, args)
 }
 
 const completeTask = async ({ id }: { id: string }) => {
-
   await cache.completeTask(id)
 }
 
@@ -96,16 +104,16 @@ const toggleDisclosed = async ({ id }: { id: string }) => {
 
   const wasDisclosed = storyComponent.element.hasClass(ClassName.disclosed)
   if (!wasDisclosed) await updateItems(id)
-  notifyUI(wasDisclosed ? 'collapse' : 'disclose', id)
+  notifyUI(wasDisclosed ? ItemComponentEvent.Collapse : ItemComponentEvent.Disclose, id)
 }
 
 // END EVENT HANDLERS
 
 async function updateItems(storyId?: string) {
-  notifyUI('loading', storyId)
+  notifyUI(ItemComponentEvent.Loading, storyId)
   try {
     await cache.fetchItems(storyId, [ ItemType.Story, ItemType.Task ])
   } finally {
-    notifyUI('loading-done', storyId)
+    notifyUI(ItemComponentEvent.LoadingDone, storyId)
   }
 }
