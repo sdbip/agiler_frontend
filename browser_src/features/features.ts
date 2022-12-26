@@ -6,7 +6,8 @@ import { Popup } from './popup.js'
 import { PageComponent } from '../page-component.js'
 import { ClassName } from '../class-name.js'
 import { ItemCache, ItemCacheEvent } from '../item-cache.js'
-import { Backend } from '../backend/backend.js'
+import { Backend, Fetcher } from '../backend/backend.js'
+import * as env from '../backend/config.js'
 import { ItemType } from '../backend/dtos.js'
 import { ItemComponent, ItemComponentEvent } from '../item-component.js'
 
@@ -17,7 +18,7 @@ import { ItemComponent, ItemComponentEvent } from '../item-component.js'
   updateItems()
 })()
 
-const cache = new ItemCache(new Backend())
+const cache = new ItemCache(new Backend(new Fetcher(), env))
 
 // EVENT HANDLERS
 
