@@ -12,10 +12,19 @@ type Configuration = {
 }
 
 export class Backend {
-  constructor(private readonly fetcher: Fetcher, private readonly env: Configuration) { }
+
+  constructor(
+    private readonly authenticatedUser: string,
+    private readonly fetcher: Fetcher,
+    private readonly env: Configuration) {
+  }
 
   async fetchItem(id: string): Promise<ItemDTO | undefined> {
-    const response = await this.fetcher.fetch(`${this.env.READ_MODEL_URL}/item/${id}`)
+    const response = await this.fetcher.fetch(`${this.env.READ_MODEL_URL}/item/${id}`, {
+      headers: {
+        ... this.authenticatedUser && { 'Authorization': this.authenticatedUser },
+      }
+    })
     if (!response.ok) throw new Error(`status ${response.status}\n${await response.text()}`)
     return await response.json()
   }
@@ -25,7 +34,11 @@ export class Backend {
       ? `${this.env.READ_MODEL_URL}/item/${parentId}/child`
       : `${this.env.READ_MODEL_URL}/item`
     const query = types.length ? `?type=${types.join('|')}` : ''
-    const response = await this.fetcher.fetch(`${baseURL}${query}`)
+    const response = await this.fetcher.fetch(`${baseURL}${query}`, {
+      headers: {
+        ... this.authenticatedUser && { 'Authorization': this.authenticatedUser },
+      }
+    })
     if (!response.ok) throw new Error(`status ${response.status}\n${await response.text()}`)
     return await response.json()
   }
@@ -39,6 +52,7 @@ export class Backend {
       method: 'POST',
       body: JSON.stringify({ title, type }),
       headers: {
+        ... this.authenticatedUser && { 'Authorization': this.authenticatedUser },
         'Content-type': 'application/json; charset=UTF-8',
       },
     })
@@ -47,12 +61,22 @@ export class Backend {
   }
 
   async promoteTask(id: string): Promise<void> {
-    const response = await this.fetcher.fetch(`${this.env.WRITE_MODEL_URL}/item/${id}/promote`, { method: 'PATCH' })
+    const response = await this.fetcher.fetch(`${this.env.WRITE_MODEL_URL}/item/${id}/promote`, {
+      method: 'PATCH',
+      headers: {
+        ... this.authenticatedUser && { 'Authorization': this.authenticatedUser },
+      },
+    })
     if (!response.ok) throw new Error(`status ${response.status}\n${await response.text()}`)
   }
 
   async completeTask(id: string): Promise<void> {
-    const response = await this.fetcher.fetch(`${this.env.WRITE_MODEL_URL}/item/${id}/complete`, { method: 'PATCH' })
+    const response = await this.fetcher.fetch(`${this.env.WRITE_MODEL_URL}/item/${id}/complete`, {
+      method: 'PATCH',
+      headers: {
+        ... this.authenticatedUser && { 'Authorization': this.authenticatedUser },
+      },
+    });
     if (!response.ok) throw new Error(`status ${response.status}\n${await response.text()}`)
   }
 }

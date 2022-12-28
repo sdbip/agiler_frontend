@@ -18,7 +18,7 @@ import { ItemComponent, ItemComponentEvent } from '../item-component.js'
   updateItems()
 })()
 
-const cache = new ItemCache(new Backend(new Fetcher(), env))
+const cache = new ItemCache(new Backend('frontend', new Fetcher(), env))
 
 // EVENT HANDLERS
 

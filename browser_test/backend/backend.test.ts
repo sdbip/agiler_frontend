@@ -5,7 +5,7 @@ import { ItemType } from "../../browser_src/backend/dtos.js"
 class MockFetcher implements Fetcher {
   nextResponse?: unknown
   lastURL?: URL | RequestInfo
-  lastRequestInit?: RequestInit
+  lastRequestInit?: any
 
   async fetch(url: URL | RequestInfo, init?: RequestInit): Promise<Response> {
     this.lastURL = url
@@ -26,7 +26,7 @@ describe(Backend.name, () => {
 
   beforeEach(() => {
     fetcher = new MockFetcher()
-    backend = new Backend(fetcher, testConfig)
+    backend = new Backend('username', fetcher, testConfig)
   })
 
   describe('fetchItem (singular)', () => {
@@ -51,12 +51,14 @@ describe(Backend.name, () => {
       assert.equal(fetcher.lastURL, `${testConfig.READ_MODEL_URL}/item/id`)
     })
 
-    it('does not add headers', () => {
+    it('includes authorization header', () => {
       fetcher.nextResponse = SUCCESSFUL_RESPONSE
 
       backend.fetchItem('id')
 
-      assert.notExists(fetcher.lastRequestInit?.headers)
+      assert.deepInclude(
+        fetcher.lastRequestInit?.headers,
+        { 'Authorization': 'username' })
     })
 
     it('returns the JSON data', async () => {
@@ -114,12 +116,14 @@ describe(Backend.name, () => {
       assert.equal(fetcher.lastURL, 'read/item?type=Task|Story')
     })
 
-    it('does not add headers', () => {
+    it('includes authorization header', () => {
       fetcher.nextResponse = SUCCESSFUL_RESPONSE
 
       backend.fetchItems(undefined, [])
 
-      assert.notExists(fetcher.lastRequestInit?.headers)
+      assert.deepInclude(
+        fetcher.lastRequestInit?.headers,
+        { 'Authorization': 'username' })
     })
 
     it('returns JSON data', async () => {
@@ -176,6 +180,7 @@ describe(Backend.name, () => {
       backend.addItem('', ItemType.Task, undefined)
 
       assert.deepEqual(fetcher.lastRequestInit?.headers, {
+        'Authorization': 'username',
         'Content-type': 'application/json; charset=UTF-8',
       })
     })
@@ -228,12 +233,14 @@ describe(Backend.name, () => {
       assert.equal(fetcher.lastRequestInit?.method, 'PATCH')
     })
 
-    it('does not add headers', () => {
+    it('includes authorization header', () => {
       fetcher.nextResponse = SUCCESSFUL_RESPONSE
 
       backend.completeTask('id')
 
-      assert.notExists(fetcher.lastRequestInit?.headers)
+      assert.deepInclude(
+        fetcher.lastRequestInit?.headers,
+        { 'Authorization': 'username' })
     })
   })
 
@@ -268,12 +275,14 @@ describe(Backend.name, () => {
       assert.equal(fetcher.lastRequestInit?.method, 'PATCH')
     })
 
-    it('does not add headers', () => {
+    it('includes authorization header', () => {
       fetcher.nextResponse = SUCCESSFUL_RESPONSE
 
       backend.promoteTask('id')
 
-      assert.notExists(fetcher.lastRequestInit?.headers)
+      assert.deepInclude(
+        fetcher.lastRequestInit?.headers,
+        { 'Authorization': 'username' })
     })
   })
 })
