@@ -51,14 +51,17 @@ describe(Backend.name, () => {
       assert.equal(fetcher.lastURL, `${testConfig.READ_MODEL_URL}/item/id`)
     })
 
-    it('includes authorization header', () => {
+    it('includes headers', () => {
       fetcher.nextResponse = SUCCESSFUL_RESPONSE
 
       backend.fetchItem('id')
 
       assert.deepInclude(
         fetcher.lastRequestInit?.headers,
-        { 'Authorization': 'username' })
+        {
+          'Authorization': 'username',
+          'Accept': 'application/json'
+        })
     })
 
     it('returns the JSON data', async () => {
@@ -116,14 +119,17 @@ describe(Backend.name, () => {
       assert.equal(fetcher.lastURL, 'read/item?type=Task|Story')
     })
 
-    it('includes authorization header', () => {
+    it('includes headers', () => {
       fetcher.nextResponse = SUCCESSFUL_RESPONSE
 
       backend.fetchItems(undefined, [])
 
       assert.deepInclude(
         fetcher.lastRequestInit?.headers,
-        { 'Authorization': 'username' })
+        {
+          'Authorization': 'username',
+          'Accept': 'application/json',
+        })
     })
 
     it('returns JSON data', async () => {
@@ -182,6 +188,7 @@ describe(Backend.name, () => {
       assert.deepEqual(fetcher.lastRequestInit?.headers, {
         'Authorization': 'username',
         'Content-type': 'application/json; charset=UTF-8',
+        'Accept': 'application/json',
       })
     })
 
@@ -233,14 +240,17 @@ describe(Backend.name, () => {
       assert.equal(fetcher.lastRequestInit?.method, 'PATCH')
     })
 
-    it('includes authorization header', () => {
+    it('includes headers', () => {
       fetcher.nextResponse = SUCCESSFUL_RESPONSE
 
       backend.completeTask('id')
 
       assert.deepInclude(
         fetcher.lastRequestInit?.headers,
-        { 'Authorization': 'username' })
+        {
+          'Authorization': 'username',
+          'Accept': 'application/json'
+        })
     })
   })
 
@@ -275,14 +285,17 @@ describe(Backend.name, () => {
       assert.equal(fetcher.lastRequestInit?.method, 'PATCH')
     })
 
-    it('includes authorization header', () => {
+    it('includes headers', () => {
       fetcher.nextResponse = SUCCESSFUL_RESPONSE
 
       backend.promoteTask('id')
 
       assert.deepInclude(
         fetcher.lastRequestInit?.headers,
-        { 'Authorization': 'username' })
+        {
+          'Authorization': 'username',
+          'Accept': 'application/json'
+        })
     })
   })
 })

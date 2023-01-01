@@ -22,6 +22,7 @@ export class Backend {
   async fetchItem(id: string): Promise<ItemDTO | undefined> {
     const response = await this.fetcher.fetch(`${this.env.READ_MODEL_URL}/item/${id}`, {
       headers: {
+        'Accept': 'application/json',
         ... this.authenticatedUser && { 'Authorization': this.authenticatedUser },
       }
     })
@@ -36,6 +37,7 @@ export class Backend {
     const query = types.length ? `?type=${types.join('|')}` : ''
     const response = await this.fetcher.fetch(`${baseURL}${query}`, {
       headers: {
+        'Accept': 'application/json',
         ... this.authenticatedUser && { 'Authorization': this.authenticatedUser },
       }
     })
@@ -53,6 +55,7 @@ export class Backend {
       body: JSON.stringify({ title, type }),
       headers: {
         ... this.authenticatedUser && { 'Authorization': this.authenticatedUser },
+        'Accept': 'application/json',
         'Content-type': 'application/json; charset=UTF-8',
       },
     })
@@ -64,6 +67,7 @@ export class Backend {
     const response = await this.fetcher.fetch(`${this.env.WRITE_MODEL_URL}/item/${id}/promote`, {
       method: 'PATCH',
       headers: {
+        'Accept': 'application/json',
         ... this.authenticatedUser && { 'Authorization': this.authenticatedUser },
       },
     })
@@ -74,6 +78,7 @@ export class Backend {
     const response = await this.fetcher.fetch(`${this.env.WRITE_MODEL_URL}/item/${id}/complete`, {
       method: 'PATCH',
       headers: {
+        'Accept': 'application/json',
         ... this.authenticatedUser && { 'Authorization': this.authenticatedUser },
       },
     });

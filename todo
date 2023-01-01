@@ -2,5 +2,4 @@
 
 # Tasks
 - Create a UI view for entering username if not yet set. Make it utterly simplistic as it should not be kept around.
-- Add Accept header ('Accept': 'application/json') to all backend calls
 - CSS tests?
