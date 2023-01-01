@@ -11,6 +11,13 @@ type Configuration = {
   get WRITE_MODEL_URL(): string
 }
 
+type FetchParameters = {
+  url: string
+  method: 'GET' | 'POST' | 'PATCH'
+  headers?: Record<string, string>
+  body?: string
+}
+
 export class Backend {
 
   constructor(
@@ -20,13 +27,10 @@ export class Backend {
   }
 
   async fetchItem(id: string): Promise<ItemDTO | undefined> {
-    const response = await this.fetcher.fetch(`${this.env.READ_MODEL_URL}/item/${id}`, {
-      headers: {
-        'Accept': 'application/json',
-        ... this.authenticatedUser && { 'Authorization': this.authenticatedUser },
-      },
+    const response = await this.fetch({
+      method: 'GET',
+      url: `${this.env.READ_MODEL_URL}/item/${id}`,
     })
-    if (!response.ok) throw new Error(`status ${response.status}\n${await response.text()}`)
     return await response.json()
   }
 
@@ -35,13 +39,10 @@ export class Backend {
       ? `${this.env.READ_MODEL_URL}/item/${parentId}/child`
       : `${this.env.READ_MODEL_URL}/item`
     const query = types.length ? `?type=${types.join('|')}` : ''
-    const response = await this.fetcher.fetch(`${baseURL}${query}`, {
-      headers: {
-        'Accept': 'application/json',
-        ... this.authenticatedUser && { 'Authorization': this.authenticatedUser },
-      },
+    const response = await this.fetch({
+      method: 'GET',
+      url: `${baseURL}${query}`,
     })
-    if (!response.ok) throw new Error(`status ${response.status}\n${await response.text()}`)
     return await response.json()
   }
 
@@ -50,38 +51,40 @@ export class Backend {
       ? `${this.env.WRITE_MODEL_URL}/item/${parentId}/child`
       : `${this.env.WRITE_MODEL_URL}/item`
 
-    const response = await this.fetcher.fetch(url, {
+    const response = await this.fetch({
       method: 'POST',
+      url,
       body: JSON.stringify({ title, type }),
-      headers: {
-        ... this.authenticatedUser && { 'Authorization': this.authenticatedUser },
-        'Accept': 'application/json',
-        'Content-type': 'application/json; charset=UTF-8',
-      },
+      headers: { 'Content-type': 'application/json; charset=UTF-8' },
     })
-    if (!response.ok) throw new Error(`status ${response.status}\n${await response.text()}`)
     return await response.json()
   }
 
   async promoteTask(id: string): Promise<void> {
-    const response = await this.fetcher.fetch(`${this.env.WRITE_MODEL_URL}/item/${id}/promote`, {
+    await this.fetch({
+      url: `${this.env.WRITE_MODEL_URL}/item/${id}/promote`,
       method: 'PATCH',
-      headers: {
-        'Accept': 'application/json',
-        ... this.authenticatedUser && { 'Authorization': this.authenticatedUser },
-      },
     })
-    if (!response.ok) throw new Error(`status ${response.status}\n${await response.text()}`)
   }
 
   async completeTask(id: string): Promise<void> {
-    const response = await this.fetcher.fetch(`${this.env.WRITE_MODEL_URL}/item/${id}/complete`, {
+    await this.fetch({
       method: 'PATCH',
+      url: `${this.env.WRITE_MODEL_URL}/item/${id}/complete`,
+    })
+  }
+
+  private async fetch({ url, method, headers, body }: FetchParameters) {
+    const response = await this.fetcher.fetch(url, {
+      method,
+      body,
       headers: {
         'Accept': 'application/json',
+        ... headers,
         ... this.authenticatedUser && { 'Authorization': this.authenticatedUser },
       },
     })
     if (!response.ok) throw new Error(`status ${response.status}\n${await response.text()}`)
+    return response
   }
 }
