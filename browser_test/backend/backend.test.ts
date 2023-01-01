@@ -1,13 +1,13 @@
-import { assert } from "@esm-bundle/chai"
-import { Backend, Fetcher } from "../../browser_src/backend/backend.js"
-import { ItemType } from "../../browser_src/backend/dtos.js"
+import { assert } from '@esm-bundle/chai'
+import { Backend, Fetcher } from '../../browser_src/backend/backend.js'
+import { ItemType } from '../../browser_src/backend/dtos.js'
 
 class MockFetcher implements Fetcher {
   nextResponse?: unknown
-  lastURL?: URL | RequestInfo
+  lastURL?: URL | RequestInfo
   lastRequestInit?: any
 
-  async fetch(url: URL | RequestInfo, init?: RequestInit): Promise<Response> {
+  async fetch(url: URL | RequestInfo, init?: RequestInit): Promise<Response> {
     this.lastURL = url
     this.lastRequestInit = init
     return this.nextResponse as Response
@@ -60,7 +60,7 @@ describe(Backend.name, () => {
         fetcher.lastRequestInit?.headers,
         {
           'Authorization': 'username',
-          'Accept': 'application/json'
+          'Accept': 'application/json',
         })
     })
 
@@ -249,7 +249,7 @@ describe(Backend.name, () => {
         fetcher.lastRequestInit?.headers,
         {
           'Authorization': 'username',
-          'Accept': 'application/json'
+          'Accept': 'application/json',
         })
     })
   })
@@ -294,7 +294,7 @@ describe(Backend.name, () => {
         fetcher.lastRequestInit?.headers,
         {
           'Authorization': 'username',
-          'Accept': 'application/json'
+          'Accept': 'application/json',
         })
     })
   })

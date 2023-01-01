@@ -166,7 +166,7 @@ describe(ItemCache.name, () => {
       assert.lengthOf(notifiedItems, 0)
     })
 
-    function newCache(nextTempId: string = 'some_id') {
+    function newCache(nextTempId = 'some_id') {
       return new ItemCache(backend, { next: () => nextTempId })
     }
   })

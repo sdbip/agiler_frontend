@@ -1,7 +1,7 @@
 import { ItemDTO, ItemType } from './dtos.js'
 
 export class Fetcher {
-  async fetch(url: URL | RequestInfo, init?: RequestInit): Promise<Response> {
+  async fetch(url: URL | RequestInfo, init?: RequestInit): Promise<Response> {
     return await window.fetch(url, init)
   }
 }
@@ -24,7 +24,7 @@ export class Backend {
       headers: {
         'Accept': 'application/json',
         ... this.authenticatedUser && { 'Authorization': this.authenticatedUser },
-      }
+      },
     })
     if (!response.ok) throw new Error(`status ${response.status}\n${await response.text()}`)
     return await response.json()
@@ -39,7 +39,7 @@ export class Backend {
       headers: {
         'Accept': 'application/json',
         ... this.authenticatedUser && { 'Authorization': this.authenticatedUser },
-      }
+      },
     })
     if (!response.ok) throw new Error(`status ${response.status}\n${await response.text()}`)
     return await response.json()
@@ -81,7 +81,7 @@ export class Backend {
         'Accept': 'application/json',
         ... this.authenticatedUser && { 'Authorization': this.authenticatedUser },
       },
-    });
+    })
     if (!response.ok) throw new Error(`status ${response.status}\n${await response.text()}`)
   }
 }
