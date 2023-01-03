@@ -1,5 +1,5 @@
-import { assert } from "@esm-bundle/chai"
-import { IDGenerator } from "../browser_src/id-generator"
+import { assert } from '@esm-bundle/chai'
+import { IDGenerator } from '../browser_src/id-generator'
 
 describe(IDGenerator.name, () => {
   it('returns a value', () => {

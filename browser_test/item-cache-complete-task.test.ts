@@ -1,6 +1,6 @@
 import { assert } from '@esm-bundle/chai'
-import { ItemDTO, ItemType, Progress } from '../browser_src/backend/dtos.js'
-import { CachedItem, ItemCache, ItemCacheEvent } from '../browser_src/item-cache.js'
+import { ItemType, Progress } from '../browser_src/backend/dtos.js'
+import { CachedItem, ItemCache } from '../browser_src/item-cache.js'
 import { MockBackend } from './mocks'
 
 describe(`${ItemCache.name}.completeTask`, () => {

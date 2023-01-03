@@ -54,7 +54,7 @@ describe(ItemCache.name, () => {
         unverified: initialItem?.unverified,
         item: {
           ...initialItem?.item,
-          id: 'id'
+          id: 'id',
         },
       })
     })
@@ -68,7 +68,7 @@ describe(ItemCache.name, () => {
       assert.equal(backend.lastAddedType, ItemType.Feature)
     })
 
-    function newCache(nextTempId: string = 'some_id') {
+    function newCache(nextTempId = 'some_id') {
       return new ItemCache(backend, { next: () => nextTempId })
     }
   })

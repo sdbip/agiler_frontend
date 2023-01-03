@@ -6,7 +6,8 @@ import { Popup } from './popup.js'
 import { PageComponent } from '../page-component.js'
 import { ClassName } from '../class-name.js'
 import { ItemCache, ItemCacheEvent } from '../item-cache.js'
-import { Backend } from '../backend/backend.js'
+import { Backend, Fetcher } from '../backend/backend.js'
+import * as env from '../backend/config.js'
 import { ItemType } from '../backend/dtos.js'
 import { ItemComponent, ItemComponentEvent } from '../item-component.js'
 
@@ -17,7 +18,7 @@ import { ItemComponent, ItemComponentEvent } from '../item-component.js'
   updateItems()
 })()
 
-const cache = new ItemCache(new Backend())
+const cache = new ItemCache(new Backend('frontend', new Fetcher(), env))
 
 // EVENT HANDLERS
 
@@ -57,7 +58,7 @@ globals.emitUIEvent = async (name: string, args: UIEventArgs) => {
     case 'focus':
     case 'input':
     case 'blur':
-      notifyUI(name as ItemComponentEvent, args.element.dataset.id, args)
+      notifyUI(name as ItemComponentEvent, component?.itemId, args)
       break
     case 'title-keydown':
       if (isEnterPressed(args.event as KeyboardEvent))
@@ -67,7 +68,7 @@ globals.emitUIEvent = async (name: string, args: UIEventArgs) => {
       await addFeature({ id: component?.itemId as string })
       break
     case 'disclosure-button-clicked':
-      await toggleDisclosed({ id: args.element.dataset.id as string })
+      await toggleDisclosed({ id: component?.itemId as string })
       break
   }
 

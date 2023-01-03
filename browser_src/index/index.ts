@@ -5,7 +5,8 @@ import { ClassName } from '../class-name.js'
 import { UIEventArgs } from './ui-event-args.js'
 import { render } from '../templates.js'
 import { ItemCache, ItemCacheEvent } from '../item-cache.js'
-import { Backend } from '../backend/backend.js'
+import { Backend, Fetcher } from '../backend/backend.js'
+import * as env from '../backend/config.js'
 import { ItemType } from '../backend/dtos.js'
 import { DOMElement } from '../dom-element.js'
 
@@ -16,7 +17,7 @@ import { DOMElement } from '../dom-element.js'
   updateItems()
 })()
 
-const cache = new ItemCache(new Backend())
+const cache = new ItemCache(new Backend('frontend', new Fetcher(), env))
 
 // EVENT HANDLERS
 

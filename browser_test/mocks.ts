@@ -1,6 +1,6 @@
 import { assert } from '@esm-bundle/chai'
-import { ItemDTO, ItemType } from '../browser-src/backend/dtos'
-import { Backend } from '../browser-src/item-cache'
+import { ItemDTO, ItemType } from '../browser_src/backend/dtos.js'
+import { Backend } from '../browser_src/item-cache.js'
 
 export class MockBackend implements Backend {
   lastRequestedId?: string

@@ -27,7 +27,7 @@ export enum ItemCacheEvent {
   ItemsAdded = 'items_added',
   ItemsRemoved = 'items_removed',
   ItemsChanged = 'items_changed',
-  IdChanged = "id_changed"
+  IdChanged = 'id_changed'
 }
 
 interface IDGenerator {
@@ -134,7 +134,7 @@ export class ItemCache {
       handler(items)
   }
 
-  getCachedItem(id: string): CachedItem | undefined {
+  getCachedItem(id: string): CachedItem | undefined {
     return Object.values(this.itemsByParent).flat().find(i => i.item.id === id)
   }
 
