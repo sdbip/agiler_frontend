@@ -58,7 +58,7 @@ globals.emitUIEvent = async (name: string, args: UIEventArgs) => {
     case 'focus':
     case 'input':
     case 'blur':
-      notifyUI(name as ItemComponentEvent, args.element.dataset.id, args)
+      notifyUI(name as ItemComponentEvent, component?.itemId, args)
       break
     case 'title-keydown':
       if (isEnterPressed(args.event as KeyboardEvent))
@@ -68,7 +68,7 @@ globals.emitUIEvent = async (name: string, args: UIEventArgs) => {
       await addFeature({ id: component?.itemId as string })
       break
     case 'disclosure-button-clicked':
-      await toggleDisclosed({ id: args.element.dataset.id as string })
+      await toggleDisclosed({ id: component?.itemId as string })
       break
   }
 
