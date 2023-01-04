@@ -19,7 +19,14 @@ select {
   position: fixed;
   top: 15px;
   right: 15px;
-  background-color: bisque;
+
+  appearance: none;
+
+  padding: 15px;
+  border: none;
+  outline: none;
+  font-size: 24pt;
+  background-color: var(--dark-blue);
 }
 
 .no-select {

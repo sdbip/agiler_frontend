@@ -21,7 +21,7 @@ type FetchParameters = {
 export class Backend {
 
   constructor(
-    private readonly authenticatedUser: string,
+    public authenticatedUser: string,
     private readonly fetcher: Fetcher,
     private readonly env: Configuration) {
   }

@@ -17,7 +17,8 @@ import { DOMElement } from '../dom-element.js'
   updateItems()
 })()
 
-const cache = new ItemCache(new Backend('frontend', new Fetcher(), env))
+const backend = new Backend('frontend', new Fetcher(), env)
+const cache = new ItemCache(backend)
 
 // EVENT HANDLERS
 
@@ -62,6 +63,9 @@ globals.emitUIEvent = async (name: string, args: UIEventArgs) => {
       break
     case 'disclosure-button-clicked':
       await toggleDisclosed({ id: itemId(element) as string })
+      break
+    case 'user-changed':
+      backend.authenticatedUser = (args.element as HTMLSelectElement).value
       break
   }
 
