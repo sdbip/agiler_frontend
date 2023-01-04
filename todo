@@ -1,5 +1,9 @@
 # Stories
 
 # Tasks
-- Create a UI view for entering username if not yet set. Make it utterly simplistic as it should not be kept around.
 - CSS tests?
+- Are the “events” actually events?
+  - Some are (input, focus, blur),
+  - but others are not (disclose/collapse).
+  - Should they be renamed to “messages”?
+  - Is it possible to split them up into commands and events?
