@@ -41,28 +41,27 @@ cache.on(ItemCacheEvent.ItemsRemoved, items => {
 
 globals.emitUIEvent = async (name: string, args: UIEventArgs) => {
   const element = new DOMElement(args.element)
-  const component = ItemComponent.parentComponent(element)
   switch (name) {
     case 'focus':
     case 'input':
     case 'blur':
-      notifyUI(name as ItemComponentEvent, component?.itemId, args)
+      notifyUI(name as ItemComponentEvent, itemId(element), args)
       break
     case 'complete-clicked':
-      await completeTask({ id: component?.itemId as string })
+      await completeTask({ id: itemId(element) as string })
       break
     case 'promote-clicked':
-      await promote({ id: component?.itemId as string })
+      await promote({ id: itemId(element) as string })
       break
     case 'title-keydown':
       if (isEnterPressed(args.event as KeyboardEvent))
-        await addTask({ id: component?.itemId as string })
+        await addTask({ id: itemId(element) as string })
       break
     case 'add-button-clicked':
-      await addTask({ id: component?.itemId as string })
+      await addTask({ id: itemId(element) as string })
       break
     case 'disclosure-button-clicked':
-      await toggleDisclosed({ id: component?.itemId as string })
+      await toggleDisclosed({ id: itemId(element) as string })
       break
   }
 
@@ -71,6 +70,8 @@ globals.emitUIEvent = async (name: string, args: UIEventArgs) => {
     return event.key === 'Enter'
   }
 }
+
+const itemId = (element: DOMElement) => ItemComponent.parentComponent(element)?.itemId
 
 function notifyUI(event: ItemComponentEvent, itemId?: string, args?: any) {
   const component = (itemId ? ItemComponent.forId(itemId) : undefined) ?? PageComponent.instance

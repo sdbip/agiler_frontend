@@ -43,11 +43,10 @@ cache.on(ItemCacheEvent.ItemsRemoved, items => {
 
 globals.emitUIEvent = async (name: string, args: UIEventArgs) => {
   const element = new DOMElement(args.element)
-  const component = ItemComponent.parentComponent(element)
   switch (name) {
     case 'help-mouseover': {
       const popup = await Popup.forSnippet(element.getData('snippet'))
-      popup.showNear(new DOMElement(args.element))
+      popup.showNear(element)
       break
     }
     case 'help-mouseout': {
@@ -58,17 +57,17 @@ globals.emitUIEvent = async (name: string, args: UIEventArgs) => {
     case 'focus':
     case 'input':
     case 'blur':
-      notifyUI(name as ItemComponentEvent, component?.itemId, args)
+      notifyUI(name as ItemComponentEvent, itemId(element), args)
       break
     case 'title-keydown':
       if (isEnterPressed(args.event as KeyboardEvent))
-        await addFeature({ id: component?.itemId as string })
+        await addFeature({ id: itemId(element) as string })
       break
     case 'add-button-clicked':
-      await addFeature({ id: component?.itemId as string })
+      await addFeature({ id: itemId(element) as string })
       break
     case 'disclosure-button-clicked':
-      await toggleDisclosed({ id: component?.itemId as string })
+      await toggleDisclosed({ id: itemId(element) as string })
       break
   }
 
@@ -88,6 +87,8 @@ for (const helpElement of helpElements) {
     globals.emitUIEvent('help-mouseout', { event, element: event.eventData.target })
   })
 }
+
+const itemId = (element: DOMElement) => ItemComponent.parentComponent(element)?.itemId
 
 function notifyUI(event: ItemComponentEvent, itemId?: string, args?: any) {
   const component = (itemId ? ItemComponent.forId(itemId) : undefined) ?? PageComponent.instance
