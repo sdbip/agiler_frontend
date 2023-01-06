@@ -17,8 +17,6 @@ export enum ItemComponentEvent {
   ItemChanged = 'item_changed',
   ItemRemoved = 'item_removed',
   IdChanged = 'id_changed',
-  Disclose = 'disclose',
-  Collapse = 'collapse',
 }
 
 export class ItemComponent {
@@ -106,12 +104,6 @@ export class ItemComponent {
         this.element.element.id = `item-${args}`
         this.element.setData('id', args)
         break
-      case ItemComponentEvent.Collapse:
-        this.collapse()
-        break
-      case ItemComponentEvent.Disclose:
-        this.disclose()
-        break
     }
   }
 
@@ -149,15 +141,23 @@ export class ItemComponent {
     collapsibleElement.setHeight(height)
   }
 
-  private collapse() {
-    this.element.removeClass(ClassName.disclosed)
-    getCollapsible(this).setHeight(0)
+  disclose() {
+    this.element.addClass(ClassName.disclosed)
+    this.setCollapsibleHeight(this.measureCollapsibleInstrinsicHeight())
   }
 
-  private disclose() {
-    this.element.addClass(ClassName.disclosed)
+  collapse() {
+    this.element.removeClass(ClassName.disclosed)
+    this.setCollapsibleHeight(0)
+  }
+
+  private measureCollapsibleInstrinsicHeight() {
     const intrinsicSize = MeasureComponent.instance.measure(getCollapsible(this).innerHTML)
-    getCollapsible(this).setHeight(intrinsicSize.height)
+    return intrinsicSize.height
+  }
+
+  private setCollapsibleHeight(height: number) {
+    getCollapsible(this).setHeight(height)
   }
 
   private startSpinner() {
@@ -165,7 +165,7 @@ export class ItemComponent {
     spinnerElement?.removeClass(ClassName.inactive)
   }
 
-  stopSpinner() {
+  private stopSpinner() {
     const spinnerElement = this.getElement(toSelector('.spinner'))
     spinnerElement?.addClass(ClassName.inactive)
   }

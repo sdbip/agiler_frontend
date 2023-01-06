@@ -2,8 +2,4 @@
 
 # Tasks
 - CSS tests?
-- Are the “events” actually events?
-  - Some are (input, focus, blur),
-  - but others are not (disclose/collapse).
-  - Should they be renamed to “messages”?
-  - Is it possible to split them up into commands and events?
+- Untested duplication in features.ts/index.ts

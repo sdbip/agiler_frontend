@@ -1,7 +1,6 @@
 import globals from '../globals.js'
 import { ItemComponent, ItemComponentEvent } from '../item-component.js'
 import { PageComponent } from '../page-component.js'
-import { ClassName } from '../class-name.js'
 import { UIEventArgs } from './ui-event-args.js'
 import { render } from '../templates.js'
 import { ItemCache, ItemCacheEvent } from '../item-cache.js'
@@ -103,12 +102,15 @@ const promote = async ({ id }: { id: string }) => {
 }
 
 const toggleDisclosed = async ({ id }: { id: string }) => {
-  const storyComponent = ItemComponent.forId(id)
-  if (!storyComponent) throw new Error(`Component for story with id ${id} not found`)
+  const component = ItemComponent.forId(id)
+  if (!component) throw new Error(`Component for item with id ${id} not found`)
 
-  const wasDisclosed = storyComponent.element.hasClass(ClassName.disclosed)
-  if (!wasDisclosed) await updateItems(id)
-  notifyUI(wasDisclosed ? ItemComponentEvent.Collapse : ItemComponentEvent.Disclose, id)
+  if (component.isDisclosed) {
+    component.collapse()
+  } else {
+    component.disclose()
+    await updateItems(id)
+  }
 }
 
 // END EVENT HANDLERS

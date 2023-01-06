@@ -4,7 +4,6 @@ import { UIEventArgs } from '../index/ui-event-args.js'
 import { DOMElement } from '../dom-element.js'
 import { Popup } from './popup.js'
 import { PageComponent } from '../page-component.js'
-import { ClassName } from '../class-name.js'
 import { ItemCache, ItemCacheEvent } from '../item-cache.js'
 import { Backend, Fetcher } from '../backend/backend.js'
 import * as env from '../backend/config.js'
@@ -111,12 +110,15 @@ const addFeature = async ({ id }: { id: string }) => {
 }
 
 const toggleDisclosed = async ({ id }: { id: string }) => {
-  const epicComponent = ItemComponent.forId(id)
-  if (!epicComponent) throw new Error(`Component for story with id ${id} not found`)
+  const component = ItemComponent.forId(id)
+  if (!component) throw new Error(`Component for item with id ${id} not found`)
 
-  const wasDisclosed = epicComponent.element.hasClass(ClassName.disclosed)
-  if (!wasDisclosed) await updateItems(id)
-  notifyUI(wasDisclosed ? ItemComponentEvent.Collapse : ItemComponentEvent.Disclose, id)
+  if (component.isDisclosed) {
+    component.collapse()
+  } else {
+    component.disclose()
+    await updateItems(id)
+  }
 }
 
 // END EVENT HANDLERS
