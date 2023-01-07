@@ -1,26 +1,32 @@
 import globals from '../globals.js'
-import { ItemComponent, ItemComponentEvent } from '../item-component.js'
-import { PageComponent } from '../page-component.js'
-import { UIEventArgs } from './ui-event-args.js'
 import { render } from '../templates.js'
+import { UIEventArgs } from './ui-event-args.js'
+import { DOMElement } from '../dom-element.js'
+import { Popup } from './popup.js'
+import { PageComponent } from '../page-component.js'
 import { ItemCache, ItemCacheEvent } from '../item-cache.js'
 import { Backend, Fetcher } from '../backend/backend.js'
 import * as env from '../backend/config.js'
 import { ItemType } from '../backend/dtos.js'
-import { DOMElement } from '../dom-element.js'
+import { ItemComponent, ItemComponentEvent } from '../item-component.js'
 
 (async () => {
-  const pageContainer = document.getElementById('page-container')
+  const pageContainer = DOMElement.single({ id: 'page-container' })
   if (!pageContainer) throw Error('page container not found')
-  pageContainer.innerHTML = await render('page-component', {})
+  pageContainer.setInnerHTML(await render('page-component', {}))
   updateItems()
 })()
+
+// Parameters
+const newItemType = ItemType.Task
+const types = [ ItemType.Story, ItemType.Task ]
 
 const backend = new Backend('frontend', new Fetcher(), env)
 const cache = new ItemCache(backend)
 
 // EVENT HANDLERS
 
+// TODO: This is not good: It's untested. It's repeated in index.ts. And it's not trivially correct.
 cache.on(ItemCacheEvent.ItemsAdded, items => {
   notifyUI(ItemComponentEvent.ItemsAdded, items[0].parentId, { items })
 })
@@ -42,6 +48,16 @@ cache.on(ItemCacheEvent.ItemsRemoved, items => {
 globals.emitUIEvent = async (name: string, args: UIEventArgs) => {
   const element = new DOMElement(args.element)
   switch (name) {
+    case 'help-mouseover': {
+      const popup = await Popup.forSnippet(element.getData('snippet'))
+      popup.showNear(element)
+      break
+    }
+    case 'help-mouseout': {
+      const popup = await Popup.forSnippet(element.getData('snippet'))
+      popup?.hide()
+      break
+    }
     case 'focus':
     case 'input':
     case 'blur':
@@ -55,10 +71,10 @@ globals.emitUIEvent = async (name: string, args: UIEventArgs) => {
       break
     case 'title-keydown':
       if (isEnterPressed(args.event as KeyboardEvent))
-        await addTask({ id: itemId(element) as string })
+        await addItem({ id: itemId(element) as string })
       break
     case 'add-button-clicked':
-      await addTask({ id: itemId(element) as string })
+      await addItem({ id: itemId(element) as string })
       break
     case 'disclosure-button-clicked':
       await toggleDisclosed({ id: itemId(element) as string })
@@ -74,6 +90,17 @@ globals.emitUIEvent = async (name: string, args: UIEventArgs) => {
   }
 }
 
+const helpElements = DOMElement.all({ className: { name: 'hover-help' } })
+for (const helpElement of helpElements) {
+  helpElement.on('mouseover', async event => {
+    globals.emitUIEvent('help-mouseover', { event, element: event.eventData.target })
+  })
+
+  helpElement.on('mouseout', async event => {
+    globals.emitUIEvent('help-mouseout', { event, element: event.eventData.target })
+  })
+}
+
 const itemId = (element: DOMElement) => ItemComponent.parentComponent(element)?.itemId
 
 function notifyUI(event: ItemComponentEvent, itemId?: string, args?: any) {
@@ -85,12 +112,12 @@ const completeTask = async ({ id }: { id: string }) => {
   await cache.completeTask(id)
 }
 
-const addTask = async ({ id }: { id: string }) => {
+const addItem = async ({ id }: { id: string }) => {
   const component = ItemComponent.forId(id) ?? PageComponent.instance
   const titleElement = component.titleInputElement
   if (!component.title) return
 
-  console.log('add task', await cache.addItem(ItemType.Task, component.title, id))
+  console.log(`add ${newItemType}`, await cache.addItem(newItemType, component.title, id))
   titleElement?.setInputElementValue('')
 
   await updateItems(component.itemId)
@@ -115,11 +142,11 @@ const toggleDisclosed = async ({ id }: { id: string }) => {
 
 // END EVENT HANDLERS
 
-async function updateItems(storyId?: string) {
-  notifyUI(ItemComponentEvent.Loading, storyId)
+async function updateItems(parentId?: string) {
+  notifyUI(ItemComponentEvent.Loading, parentId)
   try {
-    await cache.fetchItems(storyId, [ ItemType.Story, ItemType.Task ])
+    await cache.fetchItems(parentId, types)
   } finally {
-    notifyUI(ItemComponentEvent.LoadingDone, storyId)
+    notifyUI(ItemComponentEvent.LoadingDone, parentId)
   }
 }

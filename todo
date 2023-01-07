@@ -3,3 +3,5 @@
 # Tasks
 - CSS tests?
 - Untested duplication in features.ts/index.ts
+  - Allow the pages to evolve independently
+  - Add generic components for reuse - do not merge to one page

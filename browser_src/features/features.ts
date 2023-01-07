@@ -17,6 +17,10 @@ import { ItemComponent, ItemComponentEvent } from '../item-component.js'
   updateItems()
 })()
 
+// Parameters
+const newItemType = ItemType.Feature
+const types = [ ItemType.Epic, ItemType.Feature ]
+
 const backend = new Backend('frontend', new Fetcher(), env)
 const cache = new ItemCache(backend)
 
@@ -59,12 +63,18 @@ globals.emitUIEvent = async (name: string, args: UIEventArgs) => {
     case 'blur':
       notifyUI(name as ItemComponentEvent, itemId(element), args)
       break
+    case 'complete-clicked':
+      await completeTask({ id: itemId(element) as string })
+      break
+    case 'promote-clicked':
+      await promote({ id: itemId(element) as string })
+      break
     case 'title-keydown':
       if (isEnterPressed(args.event as KeyboardEvent))
-        await addFeature({ id: itemId(element) as string })
+        await addItem({ id: itemId(element) as string })
       break
     case 'add-button-clicked':
-      await addFeature({ id: itemId(element) as string })
+      await addItem({ id: itemId(element) as string })
       break
     case 'disclosure-button-clicked':
       await toggleDisclosed({ id: itemId(element) as string })
@@ -98,15 +108,24 @@ function notifyUI(event: ItemComponentEvent, itemId?: string, args?: any) {
   component.handleUIEvent(event, args)
 }
 
-const addFeature = async ({ id }: { id: string }) => {
+const completeTask = async ({ id }: { id: string }) => {
+  await cache.completeTask(id)
+}
+
+const addItem = async ({ id }: { id: string }) => {
   const component = ItemComponent.forId(id) ?? PageComponent.instance
   const titleElement = component.titleInputElement
   if (!component.title) return
 
-  console.log('add Feature', await cache.addItem(ItemType.Feature, component.title, id))
+  console.log(`add ${newItemType}`, await cache.addItem(newItemType, component.title, id))
   titleElement?.setInputElementValue('')
 
   await updateItems(component.itemId)
+}
+
+const promote = async ({ id }: { id: string }) => {
+  await cache.promoteTask(id)
+  await updateItems()
 }
 
 const toggleDisclosed = async ({ id }: { id: string }) => {
@@ -123,11 +142,11 @@ const toggleDisclosed = async ({ id }: { id: string }) => {
 
 // END EVENT HANDLERS
 
-async function updateItems(epicId?: string) {
-  notifyUI(ItemComponentEvent.Loading, epicId)
+async function updateItems(parentId?: string) {
+  notifyUI(ItemComponentEvent.Loading, parentId)
   try {
-    await cache.fetchItems(epicId, [ ItemType.Epic, ItemType.Feature ])
+    await cache.fetchItems(parentId, types)
   } finally {
-    notifyUI(ItemComponentEvent.LoadingDone, epicId)
+    notifyUI(ItemComponentEvent.LoadingDone, parentId)
   }
 }
