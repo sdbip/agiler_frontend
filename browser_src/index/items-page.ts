@@ -1,6 +1,5 @@
 import globals from '../globals.js'
 import { render } from '../templates.js'
-import { UIEventArgs } from '../index/ui-event-args.js'
 import { DOMElement } from '../dom-element.js'
 import { Popup } from './popup.js'
 import { PageComponent } from '../page-component.js'
@@ -10,23 +9,27 @@ import * as env from '../backend/config.js'
 import { ItemType } from '../backend/dtos.js'
 import { ItemComponent, ItemComponentEvent } from '../item-component.js'
 
-(async () => {
-  const pageContainer = DOMElement.single({ id: 'page-container' })
-  if (!pageContainer) throw Error('page container not found')
-  pageContainer.setInnerHTML(await render('page-component', {}))
-  updateItems()
-})()
+export class ItemsPage {
+  constructor(readonly newItemType: ItemType, readonly secondaryItemType: ItemType) {
+    // eslint-disable-next-line @typescript-eslint/no-this-alias
+    page = this
+  }
 
-// Parameters
-const newItemType = ItemType.Feature
-const types = [ ItemType.Epic, ItemType.Feature ]
+  async initialize() {
+    const pageContainer = DOMElement.single({ id: 'page-container' })
+    if (!pageContainer) throw Error('page container not found')
+    pageContainer.setInnerHTML(await render('page-component', {}))
+    updateItems()
+  }
+}
+
+let page: ItemsPage
 
 const backend = new Backend('frontend', new Fetcher(), env)
 const cache = new ItemCache(backend)
 
 // EVENT HANDLERS
 
-// TODO: This is not good: It's untested. It's repeated in index.ts. And it's not trivially correct.
 cache.on(ItemCacheEvent.ItemsAdded, items => {
   notifyUI(ItemComponentEvent.ItemsAdded, items[0].parentId, { items })
 })
@@ -117,7 +120,7 @@ const addItem = async ({ id }: { id: string }) => {
   const titleElement = component.titleInputElement
   if (!component.title) return
 
-  console.log(`add ${newItemType}`, await cache.addItem(newItemType, component.title, id))
+  console.log(`add ${page.newItemType}`, await cache.addItem(page.newItemType, component.title, id))
   titleElement?.setInputElementValue('')
 
   await updateItems(component.itemId)
@@ -143,10 +146,17 @@ const toggleDisclosed = async ({ id }: { id: string }) => {
 // END EVENT HANDLERS
 
 async function updateItems(parentId?: string) {
+  const types = [ page.newItemType, page.secondaryItemType ]
   notifyUI(ItemComponentEvent.Loading, parentId)
   try {
     await cache.fetchItems(parentId, types)
   } finally {
     notifyUI(ItemComponentEvent.LoadingDone, parentId)
   }
+}
+
+type UIEventArgs = {
+  itemId: string;
+  event: Event;
+  element: HTMLElement;
 }

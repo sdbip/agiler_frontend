@@ -4,7 +4,7 @@ const path = require('path')
 module.exports = {
   entry: {
     index: './dist/browser_src/index/index.js',
-    features: './dist/browser_src/features/features.js',
+    features: './dist/browser_src/index/features.js',
   },
   mode: 'production',
   stats: 'minimal',
