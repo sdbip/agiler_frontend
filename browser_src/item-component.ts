@@ -1,5 +1,5 @@
 import { ItemDTO } from './backend/dtos.js'
-import { failFast } from './fail-fast.js'
+import { guard } from './guard-clauses.js'
 import { ClassName, Selector, toSelector } from './class-name.js'
 import { CollapsibleElement } from './collapsible-dom-element.js'
 import { DOMElement } from './dom-element.js'
@@ -114,7 +114,7 @@ export class ItemComponent {
   }
 
   private async addComponents(items: ItemDTO[]) {
-    const listElement = failFast.unlessExists(this.itemListElement, 'should have a list element')
+    const listElement = guard.exists(this.itemListElement, 'should have a list element')
 
     const html = await render('item-list', {
       items,
@@ -183,6 +183,6 @@ export class ItemComponent {
 
 function getCollapsible(storyComponent: ItemComponent) {
   const element = CollapsibleElement.find({ className: { name: 'collapsible' } }, storyComponent.element)
-  failFast.unless(element instanceof CollapsibleElement, `Collapsible element for story ${storyComponent.itemId} is missing`)
+  guard.that(element instanceof CollapsibleElement, `Collapsible element for story ${storyComponent.itemId} is missing`)
   return element as CollapsibleElement
 }
