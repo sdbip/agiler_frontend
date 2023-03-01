@@ -4,7 +4,7 @@ import { PageRenderer, render } from '../src/page-renderer'
 describe(render.name, () => {
 
   it('returns a valid HTML document', async () => {
-    const html = await render('index')
+    const html = await render('stories-and-tasks')
     assert.match(html, /^<!DOCTYPE html>/)
   })
 
@@ -27,8 +27,8 @@ describe(render.name, () => {
   })
 
   it('populates the index page', async () => {
-    const renderer = await PageRenderer.mustache('index')
-    await renderer.inject('index')
+    const renderer = await PageRenderer.mustache('stories-and-tasks')
+    await renderer.inject('stories-and-tasks')
     const document = renderer.document
     assert.notEqual(document.body.innerHTML, '')
     assert.isTrue(document.body.innerHTML.startsWith('<'))
