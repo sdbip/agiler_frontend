@@ -60,13 +60,6 @@ export class Backend {
     return await response.json()
   }
 
-  async promoteTask(id: string): Promise<void> {
-    await this.fetch({
-      url: `${this.env.WRITE_MODEL_URL}/item/${id}/promote`,
-      method: 'PATCH',
-    })
-  }
-
   async completeTask(id: string): Promise<void> {
     await this.fetch({
       method: 'PATCH',

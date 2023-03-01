@@ -35,12 +35,6 @@ export class MockBackend implements Backend {
     return { id }
   }
 
-  lastPromotedId?: string
-
-  async promoteTask(id: string) {
-    this.lastPromotedId = id
-  }
-
   lastCompletedId?: string
 
   async completeTask(id: string) {

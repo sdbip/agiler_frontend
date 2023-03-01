@@ -69,9 +69,6 @@ globals.emitUIEvent = async (name: string, args: UIEventArgs) => {
     case 'complete-clicked':
       await completeTask({ id: itemId(element) as string })
       break
-    case 'promote-clicked':
-      await promote({ id: itemId(element) as string })
-      break
     case 'title-keydown':
       if (isEnterPressed(args.event as KeyboardEvent))
         await addItem({ id: itemId(element) as string })
@@ -124,11 +121,6 @@ const addItem = async ({ id }: { id: string }) => {
   titleElement?.setInputElementValue('')
 
   await updateItems(component.itemId)
-}
-
-const promote = async ({ id }: { id: string }) => {
-  await cache.promoteTask(id)
-  await updateItems()
 }
 
 const toggleDisclosed = async ({ id }: { id: string }) => {

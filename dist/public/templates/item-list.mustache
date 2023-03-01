@@ -1,8 +1,5 @@
 {{#items}}
 <div id="item-{{id}}" data-id="{{id}}" data-type="{{type}}" class="item no-select">
-  {{#canPromote}}
-  <span class="promote-button" onclick="emitUIEvent('promote-clicked', {element: this, event})">✵</span>
-  {{/canPromote}}
   {{#canComplete}}
   <label onclick="emitUIEvent('complete-clicked', {element: this, event})"></label>
   {{/canComplete}}

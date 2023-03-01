@@ -58,9 +58,6 @@ export class PageComponent {
       canComplete: () => function (this: any, text: string, render: any) {
         return this.type === 'Task' ? render(text) : ''
       },
-      canPromote: () => function (this: any, text: string, render: any) {
-        return this.type === 'Task' ? render(text) : ''
-      },
       hasChildren: () => function (this: any, text: string, render: any) {
         return this.type !== 'Task' ? render(text) : ''
       },
