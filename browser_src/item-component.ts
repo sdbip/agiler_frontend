@@ -1,5 +1,5 @@
 import { ItemDTO } from './backend/dtos.js'
-import { failFast } from './fail-fast.js'
+import { guard } from './guard-clauses.js'
 import { ClassName, Selector, toSelector } from './class-name.js'
 import { CollapsibleElement } from './collapsible-dom-element.js'
 import { DOMElement } from './dom-element.js'
@@ -17,8 +17,6 @@ export enum ItemComponentEvent {
   ItemChanged = 'item_changed',
   ItemRemoved = 'item_removed',
   IdChanged = 'id_changed',
-  Disclose = 'disclose',
-  Collapse = 'collapse',
 }
 
 export class ItemComponent {
@@ -106,12 +104,6 @@ export class ItemComponent {
         this.element.element.id = `item-${args}`
         this.element.setData('id', args)
         break
-      case ItemComponentEvent.Collapse:
-        this.collapse()
-        break
-      case ItemComponentEvent.Disclose:
-        this.disclose()
-        break
     }
   }
 
@@ -122,7 +114,7 @@ export class ItemComponent {
   }
 
   private async addComponents(items: ItemDTO[]) {
-    const listElement = failFast.unlessExists(this.itemListElement, 'should have a list element')
+    const listElement = guard.exists(this.itemListElement, 'should have a list element')
 
     const html = await render('item-list', {
       items,
@@ -149,15 +141,23 @@ export class ItemComponent {
     collapsibleElement.setHeight(height)
   }
 
-  private collapse() {
-    this.element.removeClass(ClassName.disclosed)
-    getCollapsible(this).setHeight(0)
+  disclose() {
+    this.element.addClass(ClassName.disclosed)
+    this.setCollapsibleHeight(this.measureCollapsibleInstrinsicHeight())
   }
 
-  private disclose() {
-    this.element.addClass(ClassName.disclosed)
+  collapse() {
+    this.element.removeClass(ClassName.disclosed)
+    this.setCollapsibleHeight(0)
+  }
+
+  private measureCollapsibleInstrinsicHeight() {
     const intrinsicSize = MeasureComponent.instance.measure(getCollapsible(this).innerHTML)
-    getCollapsible(this).setHeight(intrinsicSize.height)
+    return intrinsicSize.height
+  }
+
+  private setCollapsibleHeight(height: number) {
+    getCollapsible(this).setHeight(height)
   }
 
   private startSpinner() {
@@ -165,7 +165,7 @@ export class ItemComponent {
     spinnerElement?.removeClass(ClassName.inactive)
   }
 
-  stopSpinner() {
+  private stopSpinner() {
     const spinnerElement = this.getElement(toSelector('.spinner'))
     spinnerElement?.addClass(ClassName.inactive)
   }
@@ -183,6 +183,6 @@ export class ItemComponent {
 
 function getCollapsible(storyComponent: ItemComponent) {
   const element = CollapsibleElement.find({ className: { name: 'collapsible' } }, storyComponent.element)
-  failFast.unless(element instanceof CollapsibleElement, `Collapsible element for story ${storyComponent.itemId} is missing`)
+  guard.that(element instanceof CollapsibleElement, `Collapsible element for story ${storyComponent.itemId} is missing`)
   return element as CollapsibleElement
 }

@@ -5,9 +5,12 @@ import { DIST_DIR } from './config.js'
 const setup = setupServer()
 
 setup.public(resolve(`../${DIST_DIR}/public`))
-setup.get('/', () => render('index'))
-setup.get('/index', () => render('index'))
+setup.get('/', () => render('features'))
+setup.get('/index', () => render('features'))
 setup.get('/features', () => render('features'))
+setup.get('/tasks', () => render('stories-and-tasks'))
+setup.get('/stories', () => render('stories-and-tasks'))
+setup.get('/stories-and-tasks', () => render('stories-and-tasks'))
 
 const server = setup.finalize()
 const port = parseInt(process.env.PORT ?? '80') ?? 80

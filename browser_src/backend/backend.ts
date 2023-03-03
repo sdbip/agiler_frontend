@@ -21,7 +21,7 @@ type FetchParameters = {
 export class Backend {
 
   constructor(
-    private readonly authenticatedUser: string,
+    public authenticatedUser: string,
     private readonly fetcher: Fetcher,
     private readonly env: Configuration) {
   }
@@ -58,13 +58,6 @@ export class Backend {
       headers: { 'Content-type': 'application/json; charset=UTF-8' },
     })
     return await response.json()
-  }
-
-  async promoteTask(id: string): Promise<void> {
-    await this.fetch({
-      url: `${this.env.WRITE_MODEL_URL}/item/${id}/promote`,
-      method: 'PATCH',
-    })
   }
 
   async completeTask(id: string): Promise<void> {

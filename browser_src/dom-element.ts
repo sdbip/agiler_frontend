@@ -1,4 +1,4 @@
-import { failFast } from './fail-fast.js'
+import { guard } from './guard-clauses.js'
 import { ClassName, ClassSelector, Selector, TagSelector } from './class-name.js'
 
 export type DOMEvent = {
@@ -36,7 +36,7 @@ export class DOMElement {
   }
 
   private get inputElement() {
-    failFast.unlessInstanceOf(HTMLInputElement)(this.element, 'element')
+    guard.isInstanceOf(HTMLInputElement)(this.element, 'element')
     return this.element as HTMLInputElement
   }
 
@@ -50,7 +50,7 @@ export class DOMElement {
     const tempElement = document.createElement('div')
     tempElement.innerHTML = html
 
-    failFast.unless(tempElement.children.length === 1, 'HTML must result in exactly one element')
+    guard.that(tempElement.children.length === 1, 'HTML must result in exactly one element')
     return new DOMElement(tempElement.firstChild as HTMLElement)
   }
 

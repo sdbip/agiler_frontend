@@ -253,51 +253,6 @@ describe(Backend.name, () => {
         })
     })
   })
-
-  describe('promoteTask', () => {
-
-    it('throws if response status is not ok', async () => {
-      fetcher.nextResponse = FAILURE_RESPONSE
-
-      let didThrow = false
-      try {
-        await backend.promoteTask('id')
-      } catch {
-        didThrow = true
-      }
-
-      assert.isTrue(didThrow)
-    })
-
-    it('calls the /item/:id/promote endpoint', () => {
-      fetcher.nextResponse = SUCCESSFUL_RESPONSE
-
-      backend.promoteTask('id')
-
-      assert.equal(fetcher.lastURL, 'write/item/id/promote')
-    })
-
-    it('makes a PATCH request', () => {
-      fetcher.nextResponse = SUCCESSFUL_RESPONSE
-
-      backend.promoteTask('id')
-
-      assert.equal(fetcher.lastRequestInit?.method, 'PATCH')
-    })
-
-    it('includes headers', () => {
-      fetcher.nextResponse = SUCCESSFUL_RESPONSE
-
-      backend.promoteTask('id')
-
-      assert.deepInclude(
-        fetcher.lastRequestInit?.headers,
-        {
-          'Authorization': 'username',
-          'Accept': 'application/json',
-        })
-    })
-  })
 })
 
 const FAILURE_RESPONSE = { ok: false }

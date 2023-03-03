@@ -1,5 +1,5 @@
 import { ItemDTO } from './backend/dtos.js'
-import { failFast } from './fail-fast.js'
+import { guard } from './guard-clauses.js'
 import { ClassName, Selector } from './class-name.js'
 import { DOMElement } from './dom-element.js'
 import { render } from './templates.js'
@@ -48,7 +48,7 @@ export class PageComponent {
   }
 
   private async addComponents(items: ItemDTO[]) {
-    const listElement = failFast.unlessExists(this.itemListElement, 'list element')
+    const listElement = guard.exists(this.itemListElement, 'list element')
 
     const html = await render('item-list', {
       items,
@@ -56,9 +56,6 @@ export class PageComponent {
         return this.type === 'Epic' ? render(text) : ''
       },
       canComplete: () => function (this: any, text: string, render: any) {
-        return this.type === 'Task' ? render(text) : ''
-      },
-      canPromote: () => function (this: any, text: string, render: any) {
         return this.type === 'Task' ? render(text) : ''
       },
       hasChildren: () => function (this: any, text: string, render: any) {

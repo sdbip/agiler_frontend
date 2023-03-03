@@ -1,5 +1,5 @@
 # Stories
 
 # Tasks
-- Create a UI view for entering username if not yet set. Make it utterly simplistic as it should not be kept around.
 - CSS tests?
+- Redesign rendering? Does it expose the essential?

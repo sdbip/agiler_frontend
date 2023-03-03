@@ -7,3 +7,8 @@
   <div id="add-button" class="add-button" onclick="emitUIEvent('add-button-clicked', {element: this, event})">+</div>
 </div>
 <div id="item-list" class="item-list"></div>
+<select onchange="emitUIEvent('user-changed', {element: this, event})">
+  <option value="system_user">⌨️</option>
+  <option value="johan">👨🏼‍💻</option>
+  <option value="eddie">👨🏼‍🎨</option>
+</select>

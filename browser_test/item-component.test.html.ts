@@ -176,25 +176,25 @@ runTests(() => {
 
       it('styles element when disclosing subtasks', () => {
         storyComponent.element.removeClass(ClassName.disclosed)
-        storyComponent.handleUIEvent(ItemComponentEvent.Disclose)
+        storyComponent.disclose()
         assert.isTrue(storyComponent.element.hasClass(ClassName.disclosed))
       })
 
       it('styles element when collapsing the subtasks', () => {
         storyComponent.element.addClass(ClassName.disclosed)
-        storyComponent.handleUIEvent(ItemComponentEvent.Collapse)
+        storyComponent.collapse()
         assert.isFalse(storyComponent.element.hasClass(ClassName.disclosed))
       })
 
       it('discloses collapsible pane', () => {
         collapsibleElement.style.height = '0'
-        storyComponent.handleUIEvent(ItemComponentEvent.Disclose)
+        storyComponent.disclose()
         assert.equal(collapsibleElement.style.height, '28px')
       })
 
       it('collapses the collapsible pane', () => {
         collapsibleElement.style.height = '43px'
-        storyComponent.handleUIEvent(ItemComponentEvent.Collapse)
+        storyComponent.collapse()
         assert.equal(collapsibleElement.style.height, '0px')
       })
     })

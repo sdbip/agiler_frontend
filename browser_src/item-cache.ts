@@ -19,7 +19,6 @@ export interface Backend {
   fetchItems(parentId: string | undefined, types: ItemType[]): Promise<ItemDTO[]>
 
   addItem(title: string, type: ItemType, parentId: string | undefined): Promise<{ id: string }>
-  promoteTask(id: string): Promise<void>
   completeTask(id: string): Promise<void>
 }
 
@@ -66,11 +65,6 @@ export class ItemCache {
     if (parentId) this.updateItem(parentId, item => ({ ...item, type: ItemType.Epic }))
     const response = await this.backend.addItem(title, type, parentId)
     this.updateItemId(item, response.id)
-  }
-
-  async promoteTask(id: string) {
-    this.updateItem(id, item => ({ ...item, type: ItemType.Story }))
-    await this.backend.promoteTask(id)
   }
 
   async completeTask(id: string) {
